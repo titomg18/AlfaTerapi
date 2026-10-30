@@ -25,7 +25,21 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended('/admin/dashboard');
+
+            // Arahkan ke dashboard sesuai role (admin / pegawai).
+            $home = $request->user()->homeRoute();
+
+            if (! $home) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()
+                    ->withErrors(['username' => 'Akun Anda belum memiliki role. Hubungi admin.'])
+                    ->onlyInput('username');
+            }
+
+            return redirect()->route($home);
         }
 
         return back()

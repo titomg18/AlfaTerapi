@@ -10,10 +10,26 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [LoginController::class, 'destroy'])->name('logout')->middleware('auth');
 
-Route::middleware('auth')->prefix('admin')->group(function () {
+// Halaman utama: arahkan sesuai status login & role.
+Route::get('/', function () {
+    $user = auth()->user();
+
+    if (! $user) {
+        return redirect()->route('login');
+    }
+
+    $home = $user->homeRoute();
+    abort_if(! $home, 403, 'Akun Anda belum memiliki role.');
+
+    return redirect()->route($home);
+});
+
+// Khusus role admin
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', fn () => view('admin.dashboard'))->name('admin.dashboard');
 });
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+// Khusus role pegawai
+Route::middleware(['auth', 'role:pegawai'])->prefix('pegawai')->group(function () {
+    Route::get('/dashboard', fn () => view('pegawai.dashboard'))->name('pegawai.dashboard');
+});
