@@ -35,10 +35,10 @@ class KursiRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'no_kursi.required'   => 'No. kursi wajib diisi.',
-            'no_kursi.max'        => 'No. kursi maksimal 20 karakter.',
-            'no_kursi.unique'     => 'No. kursi sudah terdaftar.',
-            'keterangan.max'      => 'Keterangan maksimal 255 karakter.',
+            'no_kursi.required' => 'No. kursi wajib diisi.',
+            'no_kursi.max' => 'No. kursi maksimal 20 karakter.',
+            'no_kursi.unique' => 'No. kursi sudah terdaftar.',
+            'keterangan.max' => 'Keterangan maksimal 255 karakter.',
         ];
     }
 }

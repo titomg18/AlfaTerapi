@@ -29,7 +29,7 @@ class PasienController extends Controller
 
         return redirect()
             ->route('admin.pasien.index')
-            ->with('success', 'Pasien "' . $pasien->nama . '" berhasil didaftarkan.');
+            ->with('success', 'Pasien "'.$pasien->nama.'" berhasil didaftarkan.');
     }
 
     // UPDATE
@@ -39,7 +39,7 @@ class PasienController extends Controller
 
         return redirect()
             ->route('admin.pasien.index')
-            ->with('success', 'Data pasien "' . $pasien->nama . '" berhasil diperbarui.');
+            ->with('success', 'Data pasien "'.$pasien->nama.'" berhasil diperbarui.');
     }
 
     // DELETE (hanya admin)
@@ -49,7 +49,7 @@ class PasienController extends Controller
         if ($pasien->vouchers()->exists()) {
             return redirect()
                 ->route('admin.pasien.index')
-                ->with('error', 'Pasien "' . $pasien->nama . '" tidak bisa dihapus karena sudah memiliki voucher.');
+                ->with('error', 'Pasien "'.$pasien->nama.'" tidak bisa dihapus karena sudah memiliki voucher.');
         }
 
         $nama = $pasien->nama;
@@ -57,6 +57,6 @@ class PasienController extends Controller
 
         return redirect()
             ->route('admin.pasien.index')
-            ->with('success', 'Pasien "' . $nama . '" berhasil dihapus.');
+            ->with('success', 'Pasien "'.$nama.'" berhasil dihapus.');
     }
 }

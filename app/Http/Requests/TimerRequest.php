@@ -35,13 +35,13 @@ class TimerRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'nama.required'         => 'Nama timer wajib diisi.',
-            'nama.max'              => 'Nama timer maksimal 100 karakter.',
-            'nama.unique'           => 'Nama timer sudah dipakai.',
+            'nama.required' => 'Nama timer wajib diisi.',
+            'nama.max' => 'Nama timer maksimal 100 karakter.',
+            'nama.unique' => 'Nama timer sudah dipakai.',
             'durasi_menit.required' => 'Durasi wajib diisi.',
-            'durasi_menit.integer'  => 'Durasi harus berupa angka bulat (menit).',
-            'durasi_menit.min'      => 'Durasi minimal 1 menit.',
-            'durasi_menit.max'      => 'Durasi maksimal 600 menit (10 jam).',
+            'durasi_menit.integer' => 'Durasi harus berupa angka bulat (menit).',
+            'durasi_menit.min' => 'Durasi minimal 1 menit.',
+            'durasi_menit.max' => 'Durasi maksimal 600 menit (10 jam).',
         ];
     }
 }

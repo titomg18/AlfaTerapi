@@ -58,7 +58,7 @@ class Sesi extends Model
         return $query->when($q !== '', function ($query) use ($q) {
             $query->where(function ($w) use ($q) {
                 $w->whereHas('pasien', fn ($p) => $p->where('nama', 'like', "%{$q}%"))
-                  ->orWhereHas('voucher', fn ($v) => $v->where('kode', 'like', "%{$q}%"));
+                    ->orWhereHas('voucher', fn ($v) => $v->where('kode', 'like', "%{$q}%"));
             });
         });
     }

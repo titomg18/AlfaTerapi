@@ -14,13 +14,13 @@ class TransaksiController extends Controller
     {
         // Parameter yang tidak valid diabaikan, tidak membuat halaman error.
         $in = Validator::make($request->query(), [
-            'q'      => ['nullable', 'string', 'max:100'],
-            'dari'   => ['nullable', 'date_format:Y-m-d'],
+            'q' => ['nullable', 'string', 'max:100'],
+            'dari' => ['nullable', 'date_format:Y-m-d'],
             'sampai' => ['nullable', 'date_format:Y-m-d'],
         ])->valid();
 
-        $q      = trim((string) ($in['q'] ?? ''));
-        $dari   = $in['dari'] ?? null;
+        $q = trim((string) ($in['q'] ?? ''));
+        $dari = $in['dari'] ?? null;
         $sampai = $in['sampai'] ?? null;
 
         // Kalau terbalik, tukar otomatis

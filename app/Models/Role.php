@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['name', 'label'])]
 class Role extends Model
 {
-    public const ADMIN   = 'admin';
+    public const ADMIN = 'admin';
+
     public const PEGAWAI = 'pegawai';
 
     public function users(): HasMany

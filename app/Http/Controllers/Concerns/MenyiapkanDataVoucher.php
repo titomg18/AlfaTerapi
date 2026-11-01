@@ -12,7 +12,7 @@ trait MenyiapkanDataVoucher
 {
     protected function dataVoucher(Request $request): array
     {
-        $q      = trim((string) $request->query('q', ''));
+        $q = trim((string) $request->query('q', ''));
         $status = (string) $request->query('status', '');
 
         return [
@@ -31,10 +31,10 @@ trait MenyiapkanDataVoucher
                 ->sortBy('no_kursi', SORT_NATURAL | SORT_FLAG_CASE)
                 ->values(),
 
-            'timers'  => Timer::orderBy('durasi_menit')->get(),
+            'timers' => Timer::orderBy('durasi_menit')->get(),
             'pasiens' => Pasien::orderBy('nama')->get(['id', 'nama', 'no_telepon']),
 
-            'q'      => $q,
+            'q' => $q,
             'status' => $status,
         ];
     }

@@ -22,7 +22,7 @@ class PakaiVoucherRequest extends FormRequest
     {
         return [
             'kursi_id.required' => 'Pilih kursi terlebih dahulu.',
-            'kursi_id.exists'   => 'Kursi tidak ditemukan.',
+            'kursi_id.exists' => 'Kursi tidak ditemukan.',
         ];
     }
 }

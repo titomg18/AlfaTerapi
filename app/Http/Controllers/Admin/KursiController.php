@@ -26,7 +26,7 @@ class KursiController extends Controller
 
         return redirect()
             ->route('admin.kursi.index')
-            ->with('success', 'Kursi "' . $kursi->no_kursi . '" berhasil ditambahkan.');
+            ->with('success', 'Kursi "'.$kursi->no_kursi.'" berhasil ditambahkan.');
     }
 
     // UPDATE
@@ -36,7 +36,7 @@ class KursiController extends Controller
 
         return redirect()
             ->route('admin.kursi.index')
-            ->with('success', 'Kursi "' . $kursi->no_kursi . '" berhasil diperbarui.');
+            ->with('success', 'Kursi "'.$kursi->no_kursi.'" berhasil diperbarui.');
     }
 
     // DELETE
@@ -46,7 +46,7 @@ class KursiController extends Controller
         if ($kursi->sedangDipakai()) {
             return redirect()
                 ->route('admin.kursi.index')
-                ->with('error', 'Kursi "' . $kursi->no_kursi . '" sedang dipakai dan tidak bisa dihapus.');
+                ->with('error', 'Kursi "'.$kursi->no_kursi.'" sedang dipakai dan tidak bisa dihapus.');
         }
 
         $no = $kursi->no_kursi;
@@ -54,6 +54,6 @@ class KursiController extends Controller
 
         return redirect()
             ->route('admin.kursi.index')
-            ->with('success', 'Kursi "' . $no . '" berhasil dihapus.');
+            ->with('success', 'Kursi "'.$no.'" berhasil dihapus.');
     }
 }

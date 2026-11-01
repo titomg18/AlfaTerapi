@@ -27,15 +27,15 @@ class VoucherController extends Controller
     public function store(JualVoucherRequest $request)
     {
         $pasien = Pasien::findOrFail($request->validated('pasien_id'));
-        $timer  = Timer::findOrFail($request->validated('timer_id'));
+        $timer = Timer::findOrFail($request->validated('timer_id'));
 
         $voucher = Voucher::jual($pasien, $timer, $request->user());
 
         return redirect()
             ->route('admin.voucher.index')
-            ->with('success', 'Voucher ' . $voucher->kode . ' untuk ' . $pasien->nama . ' berhasil dibuat: '
-                . $voucher->jumlah_sesi . ' sesi, berlaku sampai '
-                . $voucher->berlaku_sampai->locale('id')->translatedFormat('j F Y') . '.');
+            ->with('success', 'Voucher '.$voucher->kode.' untuk '.$pasien->nama.' berhasil dibuat: '
+                .$voucher->jumlah_sesi.' sesi, berlaku sampai '
+                .$voucher->berlaku_sampai->locale('id')->translatedFormat('j F Y').'.');
     }
 
     // PAKAI: satu sesi dipakai di kursi kosong
@@ -51,8 +51,8 @@ class VoucherController extends Controller
 
         return redirect()
             ->route('admin.voucher.index')
-            ->with('success', 'Sesi ke-' . $sesi->nomor . ' dari ' . $voucher->jumlah_sesi . ' (' . $voucher->kode . ') dimulai di kursi '
-                . $kursi->no_kursi . ' selama ' . $voucher->durasi_label . '.');
+            ->with('success', 'Sesi ke-'.$sesi->nomor.' dari '.$voucher->jumlah_sesi.' ('.$voucher->kode.') dimulai di kursi '
+                .$kursi->no_kursi.' selama '.$voucher->durasi_label.'.');
     }
 
     // Kartu kontrol terapi (siap cetak)
@@ -77,6 +77,6 @@ class VoucherController extends Controller
 
         return redirect()
             ->route('admin.voucher.index')
-            ->with('success', 'Voucher ' . $kode . ' berhasil dihapus.');
+            ->with('success', 'Voucher '.$kode.' berhasil dihapus.');
     }
 }

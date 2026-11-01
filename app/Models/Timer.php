@@ -13,11 +13,11 @@ class Timer extends Model
     protected function durasiLabel(): Attribute
     {
         return Attribute::get(function () {
-            $jam   = intdiv($this->durasi_menit, 60);
+            $jam = intdiv($this->durasi_menit, 60);
             $menit = $this->durasi_menit % 60;
 
             return collect([
-                $jam   ? "{$jam} jam"     : null,
+                $jam ? "{$jam} jam" : null,
                 $menit ? "{$menit} menit" : null,
             ])->filter()->implode(' ');
         });

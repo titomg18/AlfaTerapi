@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         User::updateOrCreate(
             ['username' => '43499180504'],
             [
-                'name'     => 'Tito Muhammad Gafa',
+                'name' => 'Tito Muhammad Gafa',
                 'password' => 'tito1234',
             ]
         );

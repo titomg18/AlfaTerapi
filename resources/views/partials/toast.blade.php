@@ -40,6 +40,13 @@
 </style>
 
 <script>
+// Cegah tampilan halaman dari cache riwayat browser (bfcache) jika tombol Back ditekan setelah logout
+window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function () {
     @if (session('success'))
         Swal.fire({

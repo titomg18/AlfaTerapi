@@ -17,11 +17,12 @@ use Illuminate\Support\Facades\DB;
 ])]
 class Voucher extends Model
 {
-    public const JUMLAH_SESI         = 30;   // isi satu paket voucher
-    public const MASA_BERLAKU_BULAN  = 6;    // berlaku sejak tanggal pembelian
+    public const JUMLAH_SESI = 30;   // isi satu paket voucher
+
+    public const MASA_BERLAKU_BULAN = 6;    // berlaku sejak tanggal pembelian
 
     // Batas sesi per pasien dalam sehari. null = tanpa batas. Isi 1 untuk maksimal 1 sesi/hari.
-    public const MAKS_SESI_PER_HARI  = null;
+    public const MAKS_SESI_PER_HARI = null;
 
     protected function casts(): array
     {
@@ -83,11 +84,11 @@ class Voucher extends Model
     protected function durasiLabel(): Attribute
     {
         return Attribute::get(function () {
-            $jam   = intdiv($this->durasi_menit, 60);
+            $jam = intdiv($this->durasi_menit, 60);
             $menit = $this->durasi_menit % 60;
 
             return collect([
-                $jam   ? "{$jam} jam"     : null,
+                $jam ? "{$jam} jam" : null,
                 $menit ? "{$menit} menit" : null,
             ])->filter()->implode(' ');
         });
@@ -100,7 +101,7 @@ class Voucher extends Model
         return $query->when($q !== '', function ($query) use ($q) {
             $query->where(function ($w) use ($q) {
                 $w->where('kode', 'like', "%{$q}%")
-                  ->orWhereHas('pasien', fn ($p) => $p->where('nama', 'like', "%{$q}%"));
+                    ->orWhereHas('pasien', fn ($p) => $p->where('nama', 'like', "%{$q}%"));
             });
         });
     }
@@ -110,12 +111,12 @@ class Voucher extends Model
         $hitung = '(select count(*) from sesis where sesis.voucher_id = vouchers.id)';
 
         return match ($status) {
-            'aktif'       => $query->where('berlaku_sampai', '>=', now())
-                                   ->whereRaw("{$hitung} < vouchers.jumlah_sesi"),
-            'habis'       => $query->whereRaw("{$hitung} >= vouchers.jumlah_sesi"),
+            'aktif' => $query->where('berlaku_sampai', '>=', now())
+                ->whereRaw("{$hitung} < vouchers.jumlah_sesi"),
+            'habis' => $query->whereRaw("{$hitung} >= vouchers.jumlah_sesi"),
             'kedaluwarsa' => $query->where('berlaku_sampai', '<', now())
-                                   ->whereRaw("{$hitung} < vouchers.jumlah_sesi"),
-            default       => $query,
+                ->whereRaw("{$hitung} < vouchers.jumlah_sesi"),
+            default => $query,
         };
     }
 
@@ -138,13 +139,13 @@ class Voucher extends Model
     public static function jual(Pasien $pasien, Timer $timer, User $penjual): self
     {
         return static::create([
-            'kode'           => static::buatKode(),
-            'pasien_id'      => $pasien->id,
-            'timer_id'       => $timer->id,
-            'user_id'        => $penjual->id,
-            'nama_timer'     => $timer->nama,
-            'durasi_menit'   => $timer->durasi_menit,
-            'jumlah_sesi'    => static::JUMLAH_SESI,
+            'kode' => static::buatKode(),
+            'pasien_id' => $pasien->id,
+            'timer_id' => $timer->id,
+            'user_id' => $penjual->id,
+            'nama_timer' => $timer->nama,
+            'durasi_menit' => $timer->durasi_menit,
+            'jumlah_sesi' => static::JUMLAH_SESI,
             'berlaku_sampai' => now()->addMonthsNoOverflow(static::MASA_BERLAKU_BULAN)->endOfDay(),
         ]);
     }
@@ -154,18 +155,18 @@ class Voucher extends Model
     {
         return DB::transaction(function () use ($kursi, $pegawai) {
             // Kunci baris supaya dua pegawai tidak bisa memakai kursi/voucher yang sama bersamaan.
-            $kursiKunci   = Kursi::whereKey($kursi->getKey())->lockForUpdate()->firstOrFail();
+            $kursiKunci = Kursi::whereKey($kursi->getKey())->lockForUpdate()->firstOrFail();
             $voucherKunci = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
             $terpakai = $voucherKunci->sesis()->count();
 
             if ($terpakai >= $voucherKunci->jumlah_sesi) {
-                throw new DomainException('Semua ' . $voucherKunci->jumlah_sesi . ' sesi voucher ini sudah terpakai.');
+                throw new DomainException('Semua '.$voucherKunci->jumlah_sesi.' sesi voucher ini sudah terpakai.');
             }
 
             if ($voucherKunci->berlaku_sampai?->isPast()) {
                 throw new DomainException(
-                    'Voucher sudah kedaluwarsa pada ' . $voucherKunci->berlaku_sampai->locale('id')->translatedFormat('j F Y') . '.'
+                    'Voucher sudah kedaluwarsa pada '.$voucherKunci->berlaku_sampai->locale('id')->translatedFormat('j F Y').'.'
                 );
             }
 
@@ -176,7 +177,7 @@ class Voucher extends Model
 
             if ($sedangTerapi) {
                 throw new DomainException(
-                    'Pasien ini masih sedang terapi di kursi ' . ($sedangTerapi->no_kursi ?? $sedangTerapi->kursi?->no_kursi ?? '-') . '.'
+                    'Pasien ini masih sedang terapi di kursi '.($sedangTerapi->no_kursi ?? $sedangTerapi->kursi?->no_kursi ?? '-').'.'
                 );
             }
 
@@ -186,22 +187,22 @@ class Voucher extends Model
                     ->count();
 
                 if ($hariIni >= static::MAKS_SESI_PER_HARI) {
-                    throw new DomainException('Pasien ini sudah mencapai batas ' . static::MAKS_SESI_PER_HARI . ' sesi untuk hari ini.');
+                    throw new DomainException('Pasien ini sudah mencapai batas '.static::MAKS_SESI_PER_HARI.' sesi untuk hari ini.');
                 }
             }
 
             if ($kursiKunci->sedangDipakai()) {
-                throw new DomainException('Kursi ' . $kursiKunci->no_kursi . ' sedang dipakai. Pilih kursi lain.');
+                throw new DomainException('Kursi '.$kursiKunci->no_kursi.' sedang dipakai. Pilih kursi lain.');
             }
 
             $mulai = now();
 
             return $voucherKunci->sesis()->create([
-                'pasien_id'    => $voucherKunci->pasien_id,
-                'kursi_id'     => $kursiKunci->id,
-                'user_id'      => $pegawai->id,
-                'nomor'        => $terpakai + 1,
-                'no_kursi'     => $kursiKunci->no_kursi,
+                'pasien_id' => $voucherKunci->pasien_id,
+                'kursi_id' => $kursiKunci->id,
+                'user_id' => $pegawai->id,
+                'nomor' => $terpakai + 1,
+                'no_kursi' => $kursiKunci->no_kursi,
                 'nama_pegawai' => $pegawai->name,
                 'durasi_menit' => $voucherKunci->durasi_menit,
                 'dimulai_pada' => $mulai,

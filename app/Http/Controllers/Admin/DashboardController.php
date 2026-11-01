@@ -12,7 +12,8 @@ class DashboardController extends Controller
 {
     // Voucher dianggap "hampir habis" kalau sisa sesi <= 5 ATAU masa berlakunya <= 14 hari lagi.
     private const BATAS_SISA_SESI = 5;
-    private const BATAS_HARI      = 14;
+
+    private const BATAS_HARI = 14;
 
     public function index()
     {
@@ -29,7 +30,7 @@ class DashboardController extends Controller
         $hampirHabis = Voucher::filterStatus('aktif')
             ->where(function ($w) use ($hitung) {
                 $w->whereRaw("(vouchers.jumlah_sesi - {$hitung}) <= ?", [self::BATAS_SISA_SESI])
-                  ->orWhere('berlaku_sampai', '<=', now()->addDays(self::BATAS_HARI)->endOfDay());
+                    ->orWhere('berlaku_sampai', '<=', now()->addDays(self::BATAS_HARI)->endOfDay());
             });
 
         $voucherList = (clone $hampirHabis)
@@ -41,15 +42,15 @@ class DashboardController extends Controller
             ->get();
 
         return view('admin.dashboard', [
-            'totalPasien'         => Pasien::count(),
-            'pasienMingguIni'     => Pasien::where('created_at', '>=', now()->startOfWeek())->count(),
-            'kursis'              => $kursis,
-            'kursiTerpakai'       => $kursiTerpakai,
-            'voucherAktif'        => Voucher::filterStatus('aktif')->count(),
-            'voucherHampirHabis'  => (clone $hampirHabis)->count(),
-            'voucherList'         => $voucherList,
-            'transaksiHariIni'    => Sesi::selesai()->where('dimulai_pada', '>=', now()->startOfDay())->count(),
-            'transaksiTerbaru'    => Sesi::selesai()
+            'totalPasien' => Pasien::count(),
+            'pasienMingguIni' => Pasien::where('created_at', '>=', now()->startOfWeek())->count(),
+            'kursis' => $kursis,
+            'kursiTerpakai' => $kursiTerpakai,
+            'voucherAktif' => Voucher::filterStatus('aktif')->count(),
+            'voucherHampirHabis' => (clone $hampirHabis)->count(),
+            'voucherList' => $voucherList,
+            'transaksiHariIni' => Sesi::selesai()->where('dimulai_pada', '>=', now()->startOfDay())->count(),
+            'transaksiTerbaru' => Sesi::selesai()
                 ->with(['pasien', 'voucher'])
                 ->latest('dimulai_pada')
                 ->limit(5)

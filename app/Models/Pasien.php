@@ -28,7 +28,7 @@ class Pasien extends Model
         return $query->when($q !== '', function ($query) use ($q) {
             $query->where(function ($w) use ($q) {
                 $w->where('nama', 'like', "%{$q}%")
-                  ->orWhere('no_telepon', 'like', "%{$q}%");
+                    ->orWhere('no_telepon', 'like', "%{$q}%");
             });
         });
     }

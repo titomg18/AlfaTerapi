@@ -16,7 +16,7 @@ class JualVoucherRequest extends FormRequest
     {
         return [
             'pasien_id' => ['required', 'integer', 'exists:pasiens,id'],
-            'timer_id'  => ['required', 'integer', 'exists:timers,id'],
+            'timer_id' => ['required', 'integer', 'exists:timers,id'],
         ];
     }
 
@@ -24,9 +24,9 @@ class JualVoucherRequest extends FormRequest
     {
         return [
             'pasien_id.required' => 'Pilih pasien terlebih dahulu.',
-            'pasien_id.exists'   => 'Pasien tidak ditemukan.',
-            'timer_id.required'  => 'Pilih timer terlebih dahulu.',
-            'timer_id.exists'    => 'Timer tidak ditemukan.',
+            'pasien_id.exists' => 'Pasien tidak ditemukan.',
+            'timer_id.required' => 'Pilih timer terlebih dahulu.',
+            'timer_id.exists' => 'Timer tidak ditemukan.',
         ];
     }
 }

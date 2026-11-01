@@ -25,15 +25,15 @@ class PegawaiController extends Controller
         $data = $request->validate($this->rules(), $this->messages());
 
         User::create([
-            'name'     => $data['name'],
+            'name' => $data['name'],
             'username' => $data['username'],
-            'role_id'  => $data['role_id'],
+            'role_id' => $data['role_id'],
             'password' => $data['password'], // di-hash otomatis oleh cast di model User
         ]);
 
         return redirect()
             ->route('admin.pegawai.index')
-            ->with('success', 'Pengguna "' . $data['name'] . '" berhasil ditambahkan.');
+            ->with('success', 'Pengguna "'.$data['name'].'" berhasil ditambahkan.');
     }
 
     // UPDATE
@@ -44,7 +44,7 @@ class PegawaiController extends Controller
         $data = $request->validate($this->rules($user, $isSelf), $this->messages());
 
         $payload = [
-            'name'     => $data['name'],
+            'name' => $data['name'],
             'username' => $data['username'],
         ];
 
@@ -63,7 +63,7 @@ class PegawaiController extends Controller
 
         return redirect()
             ->route('admin.pegawai.index')
-            ->with('success', 'Data "' . $user->name . '" berhasil diperbarui.');
+            ->with('success', 'Data "'.$user->name.'" berhasil diperbarui.');
     }
 
     // DELETE
@@ -80,18 +80,18 @@ class PegawaiController extends Controller
 
         return redirect()
             ->route('admin.pegawai.index')
-            ->with('success', 'Pengguna "' . $name . '" berhasil dihapus.');
+            ->with('success', 'Pengguna "'.$name.'" berhasil dihapus.');
     }
 
     private function rules(?User $user = null, bool $isSelf = false): array
     {
         return [
-            'name'     => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'username' => [
                 'required', 'string', 'max:50',
                 Rule::unique('users', 'username')->ignore($user?->id),
             ],
-            'role_id'  => $isSelf ? ['nullable'] : ['required', 'exists:roles,id'],
+            'role_id' => $isSelf ? ['nullable'] : ['required', 'exists:roles,id'],
             // Saat edit, kata sandi boleh dikosongkan.
             'password' => $user
                 ? ['nullable', 'string', 'min:8', 'confirmed']
@@ -102,13 +102,13 @@ class PegawaiController extends Controller
     private function messages(): array
     {
         return [
-            'name.required'      => 'Nama wajib diisi.',
-            'username.required'  => 'Username wajib diisi.',
-            'username.unique'    => 'Username sudah dipakai.',
-            'role_id.required'   => 'Role wajib dipilih.',
-            'role_id.exists'     => 'Role tidak valid.',
-            'password.required'  => 'Kata sandi wajib diisi.',
-            'password.min'       => 'Kata sandi minimal 8 karakter.',
+            'name.required' => 'Nama wajib diisi.',
+            'username.required' => 'Username wajib diisi.',
+            'username.unique' => 'Username sudah dipakai.',
+            'role_id.required' => 'Role wajib dipilih.',
+            'role_id.exists' => 'Role tidak valid.',
+            'password.required' => 'Kata sandi wajib diisi.',
+            'password.min' => 'Kata sandi minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi kata sandi tidak sama.',
         ];
     }

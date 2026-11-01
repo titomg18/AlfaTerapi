@@ -47,18 +47,18 @@ return new class extends Migration
 
                 if ($v->dipakai_pada) {
                     DB::table('sesis')->insert([
-                        'voucher_id'   => $v->id,
-                        'pasien_id'    => $v->pasien_id,
-                        'kursi_id'     => $v->kursi_id,
-                        'user_id'      => null,
-                        'nomor'        => 1,
-                        'no_kursi'     => $v->no_kursi ?? null,
+                        'voucher_id' => $v->id,
+                        'pasien_id' => $v->pasien_id,
+                        'kursi_id' => $v->kursi_id,
+                        'user_id' => null,
+                        'nomor' => 1,
+                        'no_kursi' => $v->no_kursi ?? null,
                         'nama_pegawai' => null,
                         'durasi_menit' => $v->durasi_menit,
                         'dimulai_pada' => $v->dipakai_pada,
                         'selesai_pada' => $v->selesai_pada,
-                        'created_at'   => $v->dipakai_pada,
-                        'updated_at'   => $v->dipakai_pada,
+                        'created_at' => $v->dipakai_pada,
+                        'updated_at' => $v->dipakai_pada,
                     ]);
                 }
             }

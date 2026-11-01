@@ -13,9 +13,9 @@ class TimerController extends Controller
     public function index()
     {
         return view('admin.timer', [
-            'timers'       => Timer::orderBy('durasi_menit')->get(),
+            'timers' => Timer::orderBy('durasi_menit')->get(),
             // Setiap timer berlaku di semua kursi, jadi cukup dihitung jumlah kursinya.
-            'jumlahKursi'  => Kursi::count(),
+            'jumlahKursi' => Kursi::count(),
         ]);
     }
 
@@ -26,7 +26,7 @@ class TimerController extends Controller
 
         return redirect()
             ->route('admin.timer.index')
-            ->with('success', 'Timer "' . $timer->nama . '" berhasil dibuat dan otomatis tersedia di semua kursi.');
+            ->with('success', 'Timer "'.$timer->nama.'" berhasil dibuat dan otomatis tersedia di semua kursi.');
     }
 
     // UPDATE
@@ -36,7 +36,7 @@ class TimerController extends Controller
 
         return redirect()
             ->route('admin.timer.index')
-            ->with('success', 'Timer "' . $timer->nama . '" berhasil diperbarui.');
+            ->with('success', 'Timer "'.$timer->nama.'" berhasil diperbarui.');
     }
 
     // DELETE
@@ -47,6 +47,6 @@ class TimerController extends Controller
 
         return redirect()
             ->route('admin.timer.index')
-            ->with('success', 'Timer "' . $nama . '" berhasil dihapus dari semua kursi.');
+            ->with('success', 'Timer "'.$nama.'" berhasil dihapus dari semua kursi.');
     }
 }

@@ -45,9 +45,9 @@ class User extends Authenticatable
     public function homeRoute(): ?string
     {
         return match ($this->role?->name) {
-            Role::ADMIN   => 'admin.dashboard',
+            Role::ADMIN => 'admin.dashboard',
             Role::PEGAWAI => 'pegawai.dashboard',
-            default       => null,
+            default => null,
         };
     }
 

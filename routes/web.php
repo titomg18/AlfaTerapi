@@ -1,17 +1,17 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\PegawaiController;
 use App\Http\Controllers\Admin\KursiController;
-use App\Http\Controllers\Admin\TimerController;
 use App\Http\Controllers\Admin\PasienController as AdminPasienController;
-use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
+use App\Http\Controllers\Admin\PegawaiController;
+use App\Http\Controllers\Admin\TimerController;
 use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
+use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Pegawai\PasienController as PegawaiPasienController;
-use App\Http\Controllers\Pegawai\VoucherController as PegawaiVoucherController;
 use App\Http\Controllers\Pegawai\TransaksiController as PegawaiTransaksiController;
+use App\Http\Controllers\Pegawai\VoucherController as PegawaiVoucherController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
@@ -35,7 +35,7 @@ Route::get('/', function () {
 });
 
 // Khusus role pegawai (daftar & edit pasien, jual & pakai voucher, lihat transaksi)
-Route::middleware(['auth', 'role:pegawai'])->prefix('pegawai')->group(function () {
+Route::middleware(['auth', 'role:pegawai', 'prevent-back-history'])->prefix('pegawai')->group(function () {
     Route::get('/dashboard', fn () => view('pegawai.dashboard'))->name('pegawai.dashboard');
 
     Route::get('/pasien', [PegawaiPasienController::class, 'index'])->name('pegawai.pasien.index');
@@ -52,7 +52,7 @@ Route::middleware(['auth', 'role:pegawai'])->prefix('pegawai')->group(function (
 });
 
 // Khusus role admin
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'role:admin', 'prevent-back-history'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     // CRUD pengguna (tambah & edit lewat pop-up)
