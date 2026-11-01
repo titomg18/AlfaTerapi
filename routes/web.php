@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\PegawaiController;
 use App\Http\Controllers\Admin\KursiController;
+use App\Http\Controllers\Admin\TimerController;
 use App\Http\Controllers\Admin\PasienController as AdminPasienController;
 use App\Http\Controllers\Pegawai\PasienController as PegawaiPasienController;
 
@@ -58,4 +59,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/kursi', [KursiController::class, 'store'])->name('admin.kursi.store');
     Route::put('/kursi/{kursi}', [KursiController::class, 'update'])->name('admin.kursi.update');
     Route::delete('/kursi/{kursi}', [KursiController::class, 'destroy'])->name('admin.kursi.destroy');
+
+    // CRUD timer (khusus admin; berlaku untuk semua kursi)
+    Route::get('/timer', [TimerController::class, 'index'])->name('admin.timer.index');
+    Route::post('/timer', [TimerController::class, 'store'])->name('admin.timer.store');
+    Route::put('/timer/{timer}', [TimerController::class, 'update'])->name('admin.timer.update');
+    Route::delete('/timer/{timer}', [TimerController::class, 'destroy'])->name('admin.timer.destroy');
 });
