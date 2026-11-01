@@ -133,8 +133,7 @@
 
                                 @if ($canDelete && $pakai === 0)
                                     <form method="POST" action="{{ route('admin.voucher.destroy', $v) }}"
-                                          data-confirm="Hapus voucher {{ $v->kode }}? Tindakan ini tidak bisa dibatalkan."
-                                          onsubmit="return confirm(this.dataset.confirm)">
+                                          data-confirm="Hapus voucher {{ $v->kode }}? Tindakan ini tidak bisa dibatalkan.">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"

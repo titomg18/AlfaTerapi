@@ -103,7 +103,7 @@
 
                 {{-- Logout (harus POST + CSRF sesuai route) --}}
                 <form method="POST" action="{{ route('logout') }}"
-                      onsubmit="return confirm('Yakin ingin keluar?')">
+                      data-confirm="Yakin ingin keluar dari akun?">
                     @csrf
                     <button type="submit"
                             class="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] border border-line bg-white px-4 text-sm font-semibold text-warn transition-colors hover:bg-[#FBEFE7]">

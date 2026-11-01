@@ -1,129 +1,126 @@
-{{-- Floating Toast Notification Pop-up --}}
-<div id="toast-container" class="pointer-events-none fixed top-5 right-5 z-50 flex max-w-sm w-[calc(100vw-2.5rem)] flex-col gap-3" aria-live="polite">
+{{-- Modal Pop-up Notifikasi & Konfirmasi (SweetAlert2) --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    .swal2-popup {
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+        border-radius: 1.25rem !important;
+        border: 1px solid #D4E2EE !important;
+        box-shadow: 0 25px 50px -12px rgba(15, 30, 54, 0.25) !important;
+        padding: 1.75rem 1.5rem !important;
+    }
+    .swal2-title {
+        font-size: 1.35rem !important;
+        font-weight: 700 !important;
+        color: #0F1E36 !important;
+        padding-top: 0.5rem !important;
+    }
+    .swal2-html-container {
+        font-size: 0.925rem !important;
+        color: #4A607A !important;
+        line-height: 1.5 !important;
+        margin-top: 0.5rem !important;
+    }
+    .swal2-confirm {
+        border-radius: 0.75rem !important;
+        font-weight: 600 !important;
+        font-size: 0.875rem !important;
+        padding: 0.65rem 1.5rem !important;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+    }
+    .swal2-cancel {
+        border-radius: 0.75rem !important;
+        font-weight: 600 !important;
+        font-size: 0.875rem !important;
+        padding: 0.65rem 1.5rem !important;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+    }
+    .swal2-timer-progress-bar {
+        background: #0284C7 !important;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
     @if (session('success'))
-        <div class="toast-item pointer-events-auto relative overflow-hidden flex items-start gap-3.5 rounded-2xl border border-emerald-200/80 bg-white/95 p-4 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] backdrop-blur transition-all duration-300 translate-x-0 opacity-100" role="status">
-            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-            </div>
-            <div class="min-w-0 flex-1 pt-0.5">
-                <div class="text-[13px] font-bold text-ink">Berhasil</div>
-                <div class="mt-0.5 text-xs text-muted leading-relaxed break-words">{{ session('success') }}</div>
-            </div>
-            <button type="button" onclick="dismissToast(this.closest('.toast-item'))" class="shrink-0 rounded-lg p-1 text-muted transition-colors hover:bg-surface hover:text-ink" aria-label="Tutup">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-            <div class="toast-progress absolute bottom-0 left-0 h-1 bg-emerald-500/80 transition-all duration-[4500ms] ease-linear w-full"></div>
-        </div>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: {!! json_encode(session('success')) !!},
+            timer: 3500,
+            timerProgressBar: true,
+            confirmButtonColor: '#0284C7',
+            confirmButtonText: 'Selesai',
+        });
     @endif
 
     @if (session('error'))
-        <div class="toast-item pointer-events-auto relative overflow-hidden flex items-start gap-3.5 rounded-2xl border border-rose-200/80 bg-white/95 p-4 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] backdrop-blur transition-all duration-300 translate-x-0 opacity-100" role="alert">
-            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600 border border-rose-100">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                </svg>
-            </div>
-            <div class="min-w-0 flex-1 pt-0.5">
-                <div class="text-[13px] font-bold text-ink">Perhatian</div>
-                <div class="mt-0.5 text-xs text-muted leading-relaxed break-words">{{ session('error') }}</div>
-            </div>
-            <button type="button" onclick="dismissToast(this.closest('.toast-item'))" class="shrink-0 rounded-lg p-1 text-muted transition-colors hover:bg-surface hover:text-ink" aria-label="Tutup">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-            <div class="toast-progress absolute bottom-0 left-0 h-1 bg-rose-500/80 transition-all duration-[4500ms] ease-linear w-full"></div>
-        </div>
+        Swal.fire({
+            icon: 'error',
+            title: 'Perhatian!',
+            text: {!! json_encode(session('error')) !!},
+            confirmButtonColor: '#DC2626',
+            confirmButtonText: 'Mengerti',
+        });
     @endif
 
     @if (session('status'))
-        <div class="toast-item pointer-events-auto relative overflow-hidden flex items-start gap-3.5 rounded-2xl border border-accent/30 bg-white/95 p-4 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] backdrop-blur transition-all duration-300 translate-x-0 opacity-100" role="status">
-            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent-dark border border-accent/20">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-            </div>
-            <div class="min-w-0 flex-1 pt-0.5">
-                <div class="text-[13px] font-bold text-ink">Informasi</div>
-                <div class="mt-0.5 text-xs text-muted leading-relaxed break-words">{{ session('status') }}</div>
-            </div>
-            <button type="button" onclick="dismissToast(this.closest('.toast-item'))" class="shrink-0 rounded-lg p-1 text-muted transition-colors hover:bg-surface hover:text-ink" aria-label="Tutup">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-            <div class="toast-progress absolute bottom-0 left-0 h-1 bg-accent transition-all duration-[4500ms] ease-linear w-full"></div>
-        </div>
+        Swal.fire({
+            icon: 'info',
+            title: 'Informasi',
+            text: {!! json_encode(session('status')) !!},
+            confirmButtonColor: '#0284C7',
+            confirmButtonText: 'OK',
+            timer: 3500,
+            timerProgressBar: true,
+        });
     @endif
-</div>
 
-<script>
-    function dismissToast(el) {
-        if (!el) return;
-        el.classList.add('opacity-0', 'translate-x-8');
-        setTimeout(() => el.remove(), 300);
-    }
+    // Intercept semua form yang memiliki data-confirm agar muncul pop-up konfirmasi
+    document.addEventListener('submit', function (e) {
+        const form = e.target;
+        if (!form || !form.dataset) return;
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.toast-item').forEach(el => {
-            const bar = el.querySelector('.toast-progress');
-            if (bar) {
-                requestAnimationFrame(() => {
-                    bar.style.width = '0%';
-                });
+        const confirmMsg = form.dataset.confirm;
+        if (!confirmMsg) return;
+
+        if (form.dataset.swalConfirmed === 'true') {
+            return;
+        }
+
+        e.preventDefault();
+
+        const isDelete = form.querySelector('input[name="_method"][value="DELETE"]') || form.action.includes('destroy');
+        const isLogout = form.action.includes('logout');
+
+        Swal.fire({
+            title: isLogout ? 'Konfirmasi Keluar' : (isDelete ? 'Konfirmasi Hapus' : 'Konfirmasi Tindakan'),
+            text: confirmMsg,
+            icon: isDelete || isLogout ? 'warning' : 'question',
+            showCancelButton: true,
+            confirmButtonColor: isDelete || isLogout ? '#DC2626' : '#0284C7',
+            cancelButtonColor: '#94A3B8',
+            confirmButtonText: isLogout ? 'Ya, Keluar' : (isDelete ? 'Ya, Hapus' : 'Ya, Lanjutkan'),
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                form.dataset.swalConfirmed = 'true';
+                form.submit();
             }
-            setTimeout(() => dismissToast(el), 4500);
         });
     });
+});
 
-    // Helper global untuk memunculkan notifikasi pop-up dari JavaScript kapan saja
-    window.showToast = function(type, message, customTitle = null) {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
-
-        const isSuccess = type === 'success';
-        const isError = type === 'error' || type === 'danger';
-
-        const borderClass = isSuccess ? 'border-emerald-200/80' : (isError ? 'border-rose-200/80' : 'border-accent/30');
-        const iconBg = isSuccess ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : (isError ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-accent-soft text-accent-dark border border-accent/20');
-        const barColor = isSuccess ? 'bg-emerald-500/80' : (isError ? 'bg-rose-500/80' : 'bg-accent');
-        const defaultTitle = isSuccess ? 'Berhasil' : (isError ? 'Perhatian' : 'Informasi');
-        const finalTitle = customTitle || defaultTitle;
-
-        const iconSvg = isSuccess 
-            ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>'
-            : (isError 
-                ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
-                : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>');
-
-        const toast = document.createElement('div');
-        toast.className = `toast-item pointer-events-auto relative overflow-hidden flex items-start gap-3.5 rounded-2xl border ${borderClass} bg-white/95 p-4 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] backdrop-blur transition-all duration-300 translate-x-8 opacity-0`;
-        toast.innerHTML = `
-            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${iconBg}">
-                ${iconSvg}
-            </div>
-            <div class="min-w-0 flex-1 pt-0.5">
-                <div class="text-[13px] font-bold text-ink">${finalTitle}</div>
-                <div class="mt-0.5 text-xs text-muted leading-relaxed break-words">${message}</div>
-            </div>
-            <button type="button" onclick="dismissToast(this.closest('.toast-item'))" class="shrink-0 rounded-lg p-1 text-muted transition-colors hover:bg-surface hover:text-ink" aria-label="Tutup">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-            <div class="toast-progress absolute bottom-0 left-0 h-1 ${barColor} transition-all duration-[4500ms] ease-linear w-full"></div>
-        `;
-        container.appendChild(toast);
-        requestAnimationFrame(() => {
-            toast.classList.remove('translate-x-8', 'opacity-0');
-            toast.classList.add('translate-x-0', 'opacity-100');
-            const bar = toast.querySelector('.toast-progress');
-            if (bar) {
-                requestAnimationFrame(() => {
-                    bar.style.width = '0%';
-                });
-            }
-        });
-        setTimeout(() => dismissToast(toast), 4500);
-    };
+// Helper global untuk memunculkan pop-up modal dari JavaScript
+window.showPopup = function (type, title, message) {
+    return Swal.fire({
+        icon: type,
+        title: title || (type === 'success' ? 'Berhasil!' : (type === 'error' ? 'Perhatian!' : 'Informasi')),
+        text: message,
+        timer: type === 'success' ? 3500 : undefined,
+        timerProgressBar: type === 'success',
+        confirmButtonColor: type === 'error' ? '#DC2626' : '#0284C7',
+        confirmButtonText: 'OK'
+    });
+};
 </script>
