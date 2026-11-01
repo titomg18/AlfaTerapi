@@ -41,4 +41,22 @@ class PasienController extends Controller
             ->route('pegawai.pasien.index')
             ->with('success', 'Data pasien "'.$pasien->nama.'" berhasil diperbarui.');
     }
+
+    // DELETE
+    public function destroy(Pasien $pasien)
+    {
+        // Riwayat voucher tidak boleh hilang
+        if ($pasien->vouchers()->exists()) {
+            return redirect()
+                ->route('pegawai.pasien.index')
+                ->with('error', 'Pasien "'.$pasien->nama.'" tidak bisa dihapus karena sudah memiliki voucher.');
+        }
+
+        $nama = $pasien->nama;
+        $pasien->delete();
+
+        return redirect()
+            ->route('pegawai.pasien.index')
+            ->with('success', 'Pasien "'.$nama.'" berhasil dihapus.');
+    }
 }

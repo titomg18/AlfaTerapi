@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -42,6 +43,38 @@ class Sesi extends Model
     public function pegawai(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // Alias untuk dipakai_pada (waktu terapi dimulai)
+    protected function dipakaiPada(): Attribute
+    {
+        return Attribute::get(fn () => $this->dimulai_pada);
+    }
+
+    // Nama timer dari voucher
+    protected function namaTimer(): Attribute
+    {
+        return Attribute::get(fn () => $this->voucher?->nama_timer ?? 'Terapi');
+    }
+
+    // Kode voucher
+    protected function kode(): Attribute
+    {
+        return Attribute::get(fn () => $this->voucher?->kode ?? '-');
+    }
+
+    // Format durasi: contoh "30 menit", "1 jam"
+    protected function durasiLabel(): Attribute
+    {
+        return Attribute::get(function () {
+            $jam = intdiv($this->durasi_menit, 60);
+            $menit = $this->durasi_menit % 60;
+
+            return collect([
+                $jam ? "{$jam} jam" : null,
+                $menit ? "{$menit} menit" : null,
+            ])->filter()->implode(' ') ?: '0 menit';
+        });
     }
 
     // Sesi yang timernya sudah habis

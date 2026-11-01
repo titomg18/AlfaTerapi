@@ -2,14 +2,6 @@
     // Dipakai bersama oleh admin/transaksi dan pegawai/transaksi.
     // Variabel: $prefix ('admin'|'pegawai'), $transaksis, $totalSesi, $totalMenit, $totalPasien, $q, $dari, $sampai
 
-    $fmtMenit = function (int $m) {
-        $jam   = intdiv($m, 60);
-        $menit = $m % 60;
-
-        return collect([$jam ? "{$jam} jam" : null, $menit ? "{$menit} menit" : null])
-            ->filter()->implode(' ') ?: '0 menit';
-    };
-
     $hariIni = now()->toDateString();
     $presets = [
         'Hari ini'        => ['dari' => $hariIni, 'sampai' => $hariIni],
@@ -20,36 +12,6 @@
     $adaFilter = $q !== '' || $dari || $sampai;
     $dateInput = 'min-h-[44px] rounded-[10px] border border-line bg-white px-3 text-sm outline-none transition-colors focus:border-accent focus:ring-2 focus:ring-accent/20';
 @endphp
-
-{{-- Info --}}
-<div class="flex items-start gap-3 rounded-xl border border-line bg-white px-4 py-3 text-sm text-muted">
-    <svg class="mt-0.5 flex-shrink-0 text-accent" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/>
-    </svg>
-    <p class="m-0">
-        Sesi masuk ke sini <span class="font-semibold text-ink">otomatis setelah timer selesai</span>.
-        Sesi yang masih berjalan belum ditampilkan. Tanggal yang dipakai adalah tanggal terapi dimulai.
-    </p>
-</div>
-
-{{-- Ringkasan (sesuai filter yang aktif) --}}
-<section class="grid grid-cols-3 gap-4 max-[640px]:grid-cols-1">
-    <div class="rounded-[14px] border border-line bg-white px-5 py-[18px]">
-        <div class="text-[13px] text-muted">Total Sesi</div>
-        <div class="mt-1.5 text-[30px] font-bold">{{ number_format($totalSesi, 0, ',', '.') }}</div>
-        <div class="mt-0.5 text-xs text-muted">voucher terpakai</div>
-    </div>
-    <div class="rounded-[14px] border border-line bg-white px-5 py-[18px]">
-        <div class="text-[13px] text-muted">Total Waktu Terapi</div>
-        <div class="mt-1.5 text-[30px] font-bold">{{ $fmtMenit($totalMenit) }}</div>
-        <div class="mt-0.5 text-xs text-muted">jumlah semua durasi</div>
-    </div>
-    <div class="rounded-[14px] border border-line bg-white px-5 py-[18px]">
-        <div class="text-[13px] text-muted">Pasien</div>
-        <div class="mt-1.5 text-[30px] font-bold">{{ number_format($totalPasien, 0, ',', '.') }}</div>
-        <div class="mt-0.5 text-xs text-muted">pasien berbeda</div>
-    </div>
-</section>
 
 {{-- Laporan --}}
 <section class="min-w-0 rounded-[14px] border border-line bg-white p-5">
@@ -122,25 +84,33 @@
             </thead>
             <tbody class="[&>tr:last-child>td]:border-b-0">
                 @forelse ($transaksis as $v)
+                    @php
+                        $mulai = $v->dimulai_pada ?? $v->dipakai_pada;
+                        $selesai = $v->selesai_pada;
+                    @endphp
                     <tr>
                         <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 font-semibold">
-                            {{ $v->dipakai_pada->locale('id')->translatedFormat('j M Y') }}
+                            {{ $mulai?->locale('id')->translatedFormat('j M Y') ?? '-' }}
                         </td>
                         <td class="border-b border-[#EDF2F7] px-2 py-3 font-semibold">{{ $v->pasien?->nama ?? '-' }}</td>
                         <td class="border-b border-[#EDF2F7] px-2 py-3">
-                            {{ $v->nama_timer }}
-                            <div class="text-xs text-muted">{{ $v->durasi_label }}</div>
+                            {{ $v->nama_timer ?? $v->voucher?->nama_timer ?? 'Terapi' }}
+                            <div class="text-xs text-muted">{{ $v->durasi_label ?? ($v->durasi_menit . ' menit') }} · sesi {{ $v->nomor }}</div>
                         </td>
                         <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3">
                             {{ $v->no_kursi ? 'Kursi ' . $v->no_kursi : '-' }}
                         </td>
                         <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 tabular-nums text-muted">
-                            {{ $v->dipakai_pada->format('H.i') }} - {{ $v->selesai_pada->format('H.i') }}
-                            @unless ($v->selesai_pada->isSameDay($v->dipakai_pada))
-                                <span class="text-xs">(+1 hari)</span>
-                            @endunless
+                            @if ($mulai && $selesai)
+                                {{ $mulai->format('H.i') }} - {{ $selesai->format('H.i') }}
+                                @unless ($selesai->isSameDay($mulai))
+                                    <span class="text-xs">(+1 hari)</span>
+                                @endunless
+                            @else
+                                -
+                            @endif
                         </td>
-                        <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 font-mono text-[13px]">{{ $v->kode }}</td>
+                        <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 font-mono text-[13px]">{{ $v->kode ?? $v->voucher?->kode ?? '-' }}</td>
                     </tr>
                 @empty
                     <tr>

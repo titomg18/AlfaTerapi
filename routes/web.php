@@ -8,7 +8,10 @@ use App\Http\Controllers\Admin\TimerController;
 use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
 use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Pegawai\DashboardController as PegawaiDashboardController;
+use App\Http\Controllers\Pegawai\KursiController as PegawaiKursiController;
 use App\Http\Controllers\Pegawai\PasienController as PegawaiPasienController;
+use App\Http\Controllers\Pegawai\TimerController as PegawaiTimerController;
 use App\Http\Controllers\Pegawai\TransaksiController as PegawaiTransaksiController;
 use App\Http\Controllers\Pegawai\VoucherController as PegawaiVoucherController;
 use Illuminate\Support\Facades\Route;
@@ -34,13 +37,18 @@ Route::get('/', function () {
     return redirect()->route($home);
 });
 
-// Khusus role pegawai (daftar & edit pasien, jual & pakai voucher, lihat transaksi)
+// Khusus role pegawai (daftar & edit pasien, jual & pakai voucher, lihat transaksi, kursi & timer read-only)
 Route::middleware(['auth', 'role:pegawai', 'prevent-back-history'])->prefix('pegawai')->group(function () {
-    Route::get('/dashboard', fn () => view('pegawai.dashboard'))->name('pegawai.dashboard');
+    Route::get('/dashboard', [PegawaiDashboardController::class, 'index'])->name('pegawai.dashboard');
 
     Route::get('/pasien', [PegawaiPasienController::class, 'index'])->name('pegawai.pasien.index');
     Route::post('/pasien', [PegawaiPasienController::class, 'store'])->name('pegawai.pasien.store');
     Route::put('/pasien/{pasien}', [PegawaiPasienController::class, 'update'])->name('pegawai.pasien.update');
+    Route::delete('/pasien/{pasien}', [PegawaiPasienController::class, 'destroy'])->name('pegawai.pasien.destroy');
+
+    // Kursi & Timer (khusus pegawai: hanya lihat / read-only)
+    Route::get('/kursi', [PegawaiKursiController::class, 'index'])->name('pegawai.kursi.index');
+    Route::get('/timer', [PegawaiTimerController::class, 'index'])->name('pegawai.timer.index');
 
     Route::get('/voucher', [PegawaiVoucherController::class, 'index'])->name('pegawai.voucher.index');
     Route::post('/voucher', [PegawaiVoucherController::class, 'store'])->name('pegawai.voucher.store');
