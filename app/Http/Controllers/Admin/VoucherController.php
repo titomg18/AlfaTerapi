@@ -23,7 +23,7 @@ class VoucherController extends Controller
         return view('admin.voucher', $this->dataVoucher($request));
     }
 
-    // CREATE: pasien membeli voucher
+    // CREATE: pasien membeli paket voucher
     public function store(JualVoucherRequest $request)
     {
         $pasien = Pasien::findOrFail($request->validated('pasien_id'));
@@ -33,32 +33,43 @@ class VoucherController extends Controller
 
         return redirect()
             ->route('admin.voucher.index')
-            ->with('success', 'Voucher ' . $voucher->kode . ' (' . $voucher->nama_timer . ') untuk ' . $pasien->nama . ' berhasil dibuat.');
+            ->with('success', 'Voucher ' . $voucher->kode . ' untuk ' . $pasien->nama . ' berhasil dibuat: '
+                . $voucher->jumlah_sesi . ' sesi, berlaku sampai '
+                . $voucher->berlaku_sampai->locale('id')->translatedFormat('j F Y') . '.');
     }
 
-    // PAKAI: voucher dipakai di kursi kosong
+    // PAKAI: satu sesi dipakai di kursi kosong
     public function pakai(PakaiVoucherRequest $request, Voucher $voucher)
     {
         $kursi = Kursi::findOrFail($request->validated('kursi_id'));
 
         try {
-            $voucher->pakaiDi($kursi);
+            $sesi = $voucher->pakaiDi($kursi, $request->user());
         } catch (DomainException $e) {
             return redirect()->route('admin.voucher.index')->with('error', $e->getMessage());
         }
 
         return redirect()
             ->route('admin.voucher.index')
-            ->with('success', 'Voucher ' . $voucher->kode . ' dipakai di kursi ' . $kursi->no_kursi . ' selama ' . $voucher->durasi_label . '.');
+            ->with('success', 'Sesi ke-' . $sesi->nomor . ' dari ' . $voucher->jumlah_sesi . ' (' . $voucher->kode . ') dimulai di kursi '
+                . $kursi->no_kursi . ' selama ' . $voucher->durasi_label . '.');
     }
 
-    // DELETE: hanya voucher yang belum dipakai (hanya admin)
+    // Kartu kontrol terapi (siap cetak)
+    public function kartu(Voucher $voucher)
+    {
+        $voucher->load(['pasien', 'sesis']);
+
+        return view('voucher.kartu', ['voucher' => $voucher, 'prefix' => 'admin']);
+    }
+
+    // DELETE: hanya voucher yang belum pernah dipakai (hanya admin)
     public function destroy(Voucher $voucher)
     {
-        if ($voucher->dipakai_pada) {
+        if ($voucher->sesis()->exists()) {
             return redirect()
                 ->route('admin.voucher.index')
-                ->with('error', 'Voucher yang sudah dipakai tidak bisa dihapus.');
+                ->with('error', 'Voucher yang sudah pernah dipakai tidak bisa dihapus.');
         }
 
         $kode = $voucher->kode;

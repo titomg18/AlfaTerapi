@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Voucher;
+use App\Models\Sesi;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -28,14 +28,14 @@ class TransaksiController extends Controller
             [$dari, $sampai] = [$sampai, $dari];
         }
 
-        // Transaksi = voucher yang sudah dipakai dan timernya sudah habis.
+        // Transaksi = sesi terapi yang timernya sudah habis.
         // Tanggal yang dipakai untuk filter adalah tanggal terapi dimulai.
-        $transaksis = Voucher::filterStatus('selesai')
+        $transaksis = Sesi::selesai()
             ->cari($q)
-            ->when($dari, fn ($query) => $query->where('dipakai_pada', '>=', Carbon::parse($dari)->startOfDay()))
-            ->when($sampai, fn ($query) => $query->where('dipakai_pada', '<=', Carbon::parse($sampai)->endOfDay()))
-            ->with('pasien')
-            ->latest('dipakai_pada')
+            ->when($dari, fn ($query) => $query->where('dimulai_pada', '>=', Carbon::parse($dari)->startOfDay()))
+            ->when($sampai, fn ($query) => $query->where('dimulai_pada', '<=', Carbon::parse($sampai)->endOfDay()))
+            ->with(['pasien', 'voucher'])
+            ->latest('dimulai_pada')
             ->paginate(15)
             ->withQueryString();
 

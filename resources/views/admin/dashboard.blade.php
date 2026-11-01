@@ -39,43 +39,15 @@
 <body class="m-0 bg-surface font-sans text-ink">
 
 @php
-    // ---- Data (kirim dari controller; nilai di bawah hanya fallback/contoh) ----
-    $totalPasien     = $totalPasien     ?? 248;
-    $pasienMingguIni = $pasienMingguIni ?? 6;
-    $jumlahKursi     = $jumlahKursi     ?? 5;
-    $voucherAktif    = $voucherAktif    ?? 57;
-    $voucherHampirHabis = $voucherHampirHabis ?? 4;
-    $transaksiHariIni   = $transaksiHariIni   ?? 14;
+    // Data dikirim oleh Admin\DashboardController:
+    // $totalPasien, $pasienMingguIni, $kursis, $kursiTerpakai, $voucherAktif,
+    // $voucherHampirHabis, $voucherList, $transaksiHariIni, $transaksiTerbaru
 
-    // Daftar kursi: ['nama' => 'Kursi 1', 'sisa_waktu' => '12:40' atau null jika kosong]
-    $kursi = $kursi ?? [
-        ['nama' => 'Kursi 1', 'sisa_waktu' => '12:40'],
-        ['nama' => 'Kursi 2', 'sisa_waktu' => '21:05'],
-        ['nama' => 'Kursi 3', 'sisa_waktu' => '38:12'],
-        ['nama' => 'Kursi 4', 'sisa_waktu' => null],
-        ['nama' => 'Kursi 5', 'sisa_waktu' => null],
-    ];
-    $kursiTerpakai = collect($kursi)->filter(fn ($k) => !empty($k['sisa_waktu']))->count();
-    $kursiKosong   = collect($kursi)->count() - $kursiTerpakai;
-
-    // Transaksi terbaru: ['pasien', 'kursi', 'durasi' (menit), 'waktu' (Carbon/string)]
-    $transaksiTerbaru = $transaksiTerbaru ?? [
-        ['pasien' => 'Siti Rahmawati', 'kursi' => 'Kursi 1', 'durasi' => 30, 'waktu' => '28 Okt 2026, 09.15'],
-        ['pasien' => 'Agus Pratama',   'kursi' => 'Kursi 3', 'durasi' => 45, 'waktu' => '28 Okt 2026, 08.50'],
-        ['pasien' => 'Dewi Lestari',   'kursi' => 'Kursi 2', 'durasi' => 30, 'waktu' => '28 Okt 2026, 08.30'],
-        ['pasien' => 'Hendra Wijaya',  'kursi' => 'Kursi 4', 'durasi' => 60, 'waktu' => '27 Okt 2026, 16.40'],
-        ['pasien' => 'Maya Anggraini', 'kursi' => 'Kursi 1', 'durasi' => 30, 'waktu' => '27 Okt 2026, 15.55'],
-    ];
-
-    // Voucher hampir habis: ['pasien', 'sisa', 'total']
-    $voucherList = $voucherList ?? [
-        ['pasien' => 'Siti Rahmawati', 'sisa' => 2, 'total' => 30],
-        ['pasien' => 'Hendra Wijaya',  'sisa' => 3, 'total' => 30],
-        ['pasien' => 'Maya Anggraini', 'sisa' => 5, 'total' => 20],
-    ];
+    $jumlahKursi = $kursis->count();
+    $kursiKosong = $jumlahKursi - $kursiTerpakai;
 
     $user     = auth()->user();
-    $userName = $user->name ?? 'Budy Siswanto';
+    $userName = $user->name ?? 'Admin';
     $userRole = $user?->role?->label ?? 'Admin';
     $initials = collect(preg_split('/\s+/', trim($userName)))->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('');
 
@@ -83,13 +55,13 @@
 
     // Menu sidebar: [label, url, pola route aktif, path svg]
     $menu = [
-        ['Dashboard', url('/admin/dashboard'), 'admin/dashboard*', '<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>'],
-        ['Pasien',    url('/admin/pasien'),    'admin/pasien*',    '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'],
-        ['Kursi',     url('/admin/kursi'),     'admin/kursi*',     '<path d="M6 3v10h12v8M6 13v8M18 13V9"/>'],
-        ['Timer',     url('/admin/timer'),     'admin/timer*',     '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>'],
-        ['Voucher',   url('/admin/voucher'),   'admin/voucher*',   '<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/>'],
-        ['Transaksi', url('/admin/transaksi'), 'admin/transaksi*', '<path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h4"/>'],
-        ['Pegawai',   url('/admin/pegawai'),   'admin/pegawai*',   '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-5 7-5s7 1.5 7 5M17 4.5a3.5 3.5 0 0 1 0 7M22 20c0-2.5-1.5-4-4-4.6"/>'],
+        ['Dashboard', route('admin.dashboard'),       'admin/dashboard*', '<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>'],
+        ['Pasien',    route('admin.pasien.index'),    'admin/pasien*',    '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'],
+        ['Kursi',     route('admin.kursi.index'),     'admin/kursi*',     '<path d="M6 3v10h12v8M6 13v8M18 13V9"/>'],
+        ['Timer',     route('admin.timer.index'),     'admin/timer*',     '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>'],
+        ['Voucher',   route('admin.voucher.index'),   'admin/voucher*',   '<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/>'],
+        ['Transaksi', route('admin.transaksi.index'), 'admin/transaksi*', '<path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h4"/>'],
+        ['Pegawai',   route('admin.pegawai.index'),   'admin/pegawai*',   '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-5 7-5s7 1.5 7 5M17 4.5a3.5 3.5 0 0 1 0 7M22 20c0-2.5-1.5-4-4-4.6"/>'],
     ];
 @endphp
 
@@ -123,8 +95,8 @@
                 <h1 class="m-0 text-[26px] font-bold">Dashboard</h1>
                 <div class="mt-1 text-sm text-muted">{{ $tanggal }}</div>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="{{ url('/admin/pasien/create') }}"
+            <div class="flex flex-wrap items-center gap-3">
+                <a href="{{ route('admin.pasien.index', ['tambah' => 1]) }}"
                    class="inline-flex min-h-[44px] items-center rounded-[10px] bg-accent px-[18px] text-sm font-semibold text-white no-underline transition-colors hover:bg-accent-dark">
                     + Daftarkan Pasien
                 </a>
@@ -160,12 +132,12 @@
             </div>
             <div class="rounded-[14px] border border-line bg-white px-5 py-[18px]">
                 <div class="text-[13px] text-muted">Kursi Terpakai</div>
-                <div class="mt-1.5 text-[30px] font-bold">{{ $kursiTerpakai }} <small class="text-base font-medium text-muted">/ {{ count($kursi) }}</small></div>
+                <div class="mt-1.5 text-[30px] font-bold">{{ $kursiTerpakai }} <small class="text-base font-medium text-muted">/ {{ $jumlahKursi }}</small></div>
                 <div class="mt-0.5 text-xs text-muted">{{ $kursiKosong }} kursi kosong</div>
             </div>
             <div class="rounded-[14px] border border-line bg-white px-5 py-[18px]">
                 <div class="text-[13px] text-muted">Voucher Aktif</div>
-                <div class="mt-1.5 text-[30px] font-bold">{{ $voucherAktif }}</div>
+                <div class="mt-1.5 text-[30px] font-bold">{{ number_format($voucherAktif, 0, ',', '.') }}</div>
                 <div class="mt-0.5 text-xs text-muted">{{ $voucherHampirHabis }} hampir habis</div>
             </div>
             <div class="rounded-[14px] border border-line bg-white px-5 py-[18px]">
@@ -175,19 +147,57 @@
             </div>
         </section>
 
+        {{-- Status kursi --}}
+        <section class="rounded-[14px] border border-line bg-white p-5">
+            <div class="mb-3.5 flex items-center justify-between">
+                <h2 class="m-0 text-base font-bold">Status Kursi</h2>
+                <span class="text-[13px] text-muted">{{ $kursiKosong }} kosong dari {{ $jumlahKursi }} kursi</span>
+            </div>
+
+            @if ($kursis->isEmpty())
+                <p class="m-0 py-4 text-center text-muted">
+                    Belum ada kursi.
+                    <a href="{{ route('admin.kursi.index') }}" class="font-semibold text-accent hover:text-accent-dark">Tambahkan kursi</a>
+                </p>
+            @else
+                <div class="grid grid-cols-5 gap-3 max-[1100px]:grid-cols-3 max-[820px]:grid-cols-2">
+                    @foreach ($kursis as $k)
+                        @php $s = $k->sesiAktif; @endphp
+                        @if ($s)
+                            <div class="rounded-xl bg-accent-soft px-4 py-3.5">
+                                <div class="text-sm font-semibold">Kursi {{ $k->no_kursi }}</div>
+                                <div class="mt-1 text-[22px] font-bold tabular-nums text-accent-dark"
+                                     data-end="{{ $s->selesai_pada->toIso8601String() }}"></div>
+                                <div class="truncate text-xs text-accent-dark" title="{{ $s->pasien?->nama }}">
+                                    {{ $s->pasien?->nama }} · sesi {{ $s->nomor }}
+                                </div>
+                            </div>
+                        @else
+                            <div class="rounded-xl border border-line bg-surface px-4 py-3.5">
+                                <div class="text-sm font-semibold">Kursi {{ $k->no_kursi }}</div>
+                                <div class="mt-1 text-[22px] font-bold text-muted">Kosong</div>
+                                <div class="truncate text-xs text-muted">{{ $k->keterangan ?: 'siap dipakai' }}</div>
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
+            @endif
+        </section>
+
         <section class="grid grid-cols-[1.6fr_1fr] items-start gap-4 max-[820px]:grid-cols-1">
 
             {{-- Transaksi terbaru --}}
             <div class="min-w-0 rounded-[14px] border border-line bg-white p-5">
                 <div class="mb-3.5 flex items-center justify-between">
                     <h2 class="m-0 text-base font-bold">Transaksi Terbaru</h2>
-                    <a href="{{ url('/admin/transaksi') }}" class="text-[13px] font-semibold text-accent hover:text-accent-dark">Lihat semua</a>
+                    <a href="{{ route('admin.transaksi.index') }}" class="text-[13px] font-semibold text-accent hover:text-accent-dark">Lihat semua</a>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full min-w-[480px] border-collapse text-[13.5px]">
+                    <table class="w-full min-w-[520px] border-collapse text-[13.5px]">
                         <thead>
                             <tr>
                                 <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Pasien</th>
+                                <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Sesi</th>
                                 <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Kursi</th>
                                 <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Durasi</th>
                                 <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Tanggal</th>
@@ -195,21 +205,21 @@
                         </thead>
                         <tbody class="[&>tr:last-child>td]:border-b-0">
                             @forelse ($transaksiTerbaru as $t)
-                                @php
-                                    $t = (object) $t;
-                                    $waktu = $t->waktu instanceof \Carbon\Carbon
-                                        ? $t->waktu->locale('id')->translatedFormat('j M Y, H.i')
-                                        : $t->waktu;
-                                @endphp
                                 <tr>
-                                    <td class="border-b border-[#EEF3F2] px-2 py-3">{{ $t->pasien }}</td>
-                                    <td class="border-b border-[#EEF3F2] px-2 py-3">{{ $t->kursi }}</td>
-                                    <td class="border-b border-[#EEF3F2] px-2 py-3">{{ $t->durasi }} menit</td>
-                                    <td class="border-b border-[#EEF3F2] px-2 py-3">{{ $waktu }}</td>
+                                    <td class="border-b border-[#EEF3F2] px-2 py-3 font-semibold">{{ $t->pasien?->nama ?? '-' }}</td>
+                                    <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 tabular-nums">
+                                        <span class="font-semibold">{{ $t->nomor }}</span>
+                                        <span class="text-muted">/ {{ $t->voucher?->jumlah_sesi ?? 30 }}</span>
+                                    </td>
+                                    <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3">{{ $t->no_kursi ? 'Kursi ' . $t->no_kursi : '-' }}</td>
+                                    <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3">{{ $t->durasi_menit }} menit</td>
+                                    <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 text-muted">
+                                        {{ $t->dimulai_pada->locale('id')->translatedFormat('j M Y, H.i') }}
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-2 py-6 text-center text-muted">Belum ada transaksi.</td>
+                                    <td colspan="5" class="px-2 py-6 text-center text-muted">Belum ada transaksi.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -217,57 +227,78 @@
                 </div>
             </div>
 
-            <div class="flex min-w-0 flex-col gap-4">
-
-                {{-- Status kursi --}}
-                <div class="rounded-[14px] border border-line bg-white p-5">
-                    <h2 class="mb-3.5 text-base font-bold">Status Kursi</h2>
-                    <div class="flex flex-col gap-2.5">
-                        @foreach ($kursi as $k)
-                            @php $k = (object) $k; @endphp
-                            @if (!empty($k->sisa_waktu))
-                                <div class="flex items-center justify-between rounded-[10px] bg-accent-soft px-3 py-2.5">
-                                    <div class="text-sm font-semibold">{{ $k->nama }}</div>
-                                    <div class="text-[13px] font-semibold text-accent-dark">Berjalan {{ $k->sisa_waktu }}</div>
-                                </div>
-                            @else
-                                <div class="flex items-center justify-between rounded-[10px] border border-line bg-surface px-3 py-2.5">
-                                    <div class="text-sm font-semibold">{{ $k->nama }}</div>
-                                    <div class="text-[13px] text-muted">Kosong</div>
+            {{-- Voucher hampir habis --}}
+            <div class="rounded-[14px] border border-line bg-white p-5">
+                <div class="mb-3.5 flex items-center justify-between">
+                    <h2 class="m-0 text-base font-bold">Voucher Hampir Habis</h2>
+                    <a href="{{ route('admin.voucher.index') }}" class="text-[13px] font-semibold text-accent hover:text-accent-dark">Lihat semua</a>
+                </div>
+                <div class="flex flex-col gap-3.5">
+                    @forelse ($voucherList as $v)
+                        @php
+                            $sisa   = max(0, $v->jumlah_sesi - $v->sesis_count);
+                            $persen = $v->jumlah_sesi > 0 ? round($sisa / $v->jumlah_sesi * 100) : 0;
+                            $sisaHari = $v->berlaku_sampai
+                                ? (int) now()->startOfDay()->diffInDays($v->berlaku_sampai->copy()->startOfDay())
+                                : null;
+                        @endphp
+                        <div>
+                            <div class="mb-1.5 flex justify-between gap-2 text-[13.5px]">
+                                <span class="truncate font-semibold">{{ $v->pasien?->nama ?? '-' }}</span>
+                                <span class="whitespace-nowrap text-muted">sisa {{ $sisa }} dari {{ $v->jumlah_sesi }}</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-[#E3ECEA]">
+                                <span class="block h-2 rounded-full bg-warn" style="width: {{ $persen }}%"></span>
+                            </div>
+                            @if ($sisaHari !== null && $sisaHari <= 14)
+                                <div class="mt-1 text-xs font-semibold text-warn">
+                                    {{ $sisaHari === 0 ? 'berakhir hari ini' : 'berakhir ' . $sisaHari . ' hari lagi' }}
                                 </div>
                             @endif
-                        @endforeach
-                    </div>
+                        </div>
+                    @empty
+                        <div class="py-6 text-center text-muted">Tidak ada voucher yang hampir habis.</div>
+                    @endforelse
                 </div>
-
-                {{-- Voucher hampir habis --}}
-                <div class="rounded-[14px] border border-line bg-white p-5">
-                    <h2 class="mb-3.5 text-base font-bold">Voucher Hampir Habis</h2>
-                    <div class="flex flex-col gap-3.5">
-                        @forelse ($voucherList as $v)
-                            @php
-                                $v = (object) $v;
-                                $persen = $v->total > 0 ? round(($v->sisa / $v->total) * 100) : 0;
-                            @endphp
-                            <div>
-                                <div class="mb-1.5 flex justify-between text-[13.5px]">
-                                    <span class="font-semibold">{{ $v->pasien }}</span>
-                                    <span class="text-muted">sisa {{ $v->sisa }} dari {{ $v->total }}</span>
-                                </div>
-                                <div class="h-2 rounded-full bg-[#E3ECEA]">
-                                    <span class="block h-2 rounded-full bg-warn" style="width: {{ $persen }}%"></span>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="py-6 text-center text-muted">Tidak ada voucher yang hampir habis.</div>
-                        @endforelse
-                    </div>
-                </div>
-
             </div>
+
         </section>
 
     </main>
 </div>
+
+<script>
+(function () {
+    // Hitung mundur di kartu kursi
+    const pad = n => String(n).padStart(2, '0');
+    const fmt = s => {
+        const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), d = s % 60;
+        return h ? h + ':' + pad(m) + ':' + pad(d) : pad(m) + ':' + pad(d);
+    };
+    const counters = Array.from(document.querySelectorAll('[data-end]'))
+        .map(el => ({ el, end: Date.parse(el.dataset.end), alive: false }));
+    let reloadScheduled = false;
+
+    function tick() {
+        const now = Date.now();
+        counters.forEach(c => {
+            const left = Math.ceil((c.end - now) / 1000);
+            if (left > 0) {
+                c.el.textContent = fmt(left);
+                c.alive = true;
+            } else {
+                c.el.textContent = 'Selesai';
+                // Muat ulang sekali saat waktu habis supaya status kursi dan transaksi diperbarui
+                // (hanya jika hitung mundur sempat berjalan di halaman ini).
+                if (c.alive && !reloadScheduled) {
+                    reloadScheduled = true;
+                    setTimeout(() => location.reload(), 2000);
+                }
+            }
+        });
+    }
+    if (counters.length) { tick(); setInterval(tick, 1000); }
+})();
+</script>
 </body>
 </html>

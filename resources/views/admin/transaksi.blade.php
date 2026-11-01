@@ -180,46 +180,51 @@
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full min-w-[720px] border-collapse text-[13.5px]">
+                <table class="w-full min-w-[820px] border-collapse text-[13.5px]">
                     <thead>
                         <tr>
                             <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Tanggal</th>
                             <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Pasien</th>
-                            <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Timer</th>
+                            <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Sesi</th>
                             <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Kursi</th>
                             <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Waktu</th>
+                            <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Terapis</th>
                             <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Kode Voucher</th>
                         </tr>
                     </thead>
                     <tbody class="[&>tr:last-child>td]:border-b-0">
-                        @forelse ($transaksis as $v)
+                        @forelse ($transaksis as $s)
                             <tr>
                                 <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 font-semibold">
-                                    {{ $v->dipakai_pada->locale('id')->translatedFormat('j M Y') }}
+                                    {{ $s->dimulai_pada->locale('id')->translatedFormat('j M Y') }}
                                 </td>
-                                <td class="border-b border-[#EEF3F2] px-2 py-3 font-semibold">{{ $v->pasien?->nama ?? '-' }}</td>
-                                <td class="border-b border-[#EEF3F2] px-2 py-3">
-                                    {{ $v->nama_timer }}
-                                    <div class="text-xs text-muted">{{ $v->durasi_label }}</div>
+                                <td class="border-b border-[#EEF3F2] px-2 py-3 font-semibold">{{ $s->pasien?->nama ?? '-' }}</td>
+                                <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 tabular-nums">
+                                    <span class="font-semibold">{{ $s->nomor }}</span>
+                                    <span class="text-muted">/ {{ $s->voucher?->jumlah_sesi ?? 30 }}</span>
                                 </td>
                                 <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3">
-                                    {{ $v->no_kursi ? 'Kursi ' . $v->no_kursi : '-' }}
+                                    {{ $s->no_kursi ? 'Kursi ' . $s->no_kursi : '-' }}
                                 </td>
                                 <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 tabular-nums text-muted">
-                                    {{ $v->dipakai_pada->format('H.i') }} - {{ $v->selesai_pada->format('H.i') }}
-                                    @unless ($v->selesai_pada->isSameDay($v->dipakai_pada))
+                                    {{ $s->dimulai_pada->format('H.i') }} - {{ $s->selesai_pada->format('H.i') }}
+                                    @unless ($s->selesai_pada->isSameDay($s->dimulai_pada))
                                         <span class="text-xs">(+1 hari)</span>
                                     @endunless
+                                    <div class="text-xs">{{ $s->durasi_menit }} menit</div>
                                 </td>
-                                <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 font-mono text-[13px]">{{ $v->kode }}</td>
+                                <td class="border-b border-[#EEF3F2] px-2 py-3">{{ $s->nama_pegawai ?? '-' }}</td>
+                                <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 font-mono text-[13px]">
+                                    {{ $s->voucher?->kode ?? '-' }}
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-2 py-6 text-center text-muted">
+                                <td colspan="7" class="px-2 py-6 text-center text-muted">
                                     @if ($adaFilter)
                                         Tidak ada sesi selesai yang cocok dengan filter.
                                     @else
-                                        Belum ada sesi yang selesai. Sesi akan muncul di sini setelah timer voucher habis.
+                                        Belum ada sesi yang selesai. Sesi akan muncul di sini setelah timer habis.
                                     @endif
                                 </td>
                             </tr>

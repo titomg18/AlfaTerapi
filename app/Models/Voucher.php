@@ -8,20 +8,25 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 #[Fillable([
     'kode', 'pasien_id', 'timer_id', 'user_id',
-    'nama_timer', 'durasi_menit',
-    'kursi_id', 'dipakai_pada', 'selesai_pada',
+    'nama_timer', 'durasi_menit', 'jumlah_sesi', 'berlaku_sampai',
 ])]
 class Voucher extends Model
 {
+    public const JUMLAH_SESI         = 30;   // isi satu paket voucher
+    public const MASA_BERLAKU_BULAN  = 6;    // berlaku sejak tanggal pembelian
+
+    // Batas sesi per pasien dalam sehari. null = tanpa batas. Isi 1 untuk maksimal 1 sesi/hari.
+    public const MAKS_SESI_PER_HARI  = null;
+
     protected function casts(): array
     {
         return [
-            'dipakai_pada' => 'datetime',
-            'selesai_pada' => 'datetime',
+            'berlaku_sampai' => 'datetime',
         ];
     }
 
@@ -35,29 +40,46 @@ class Voucher extends Model
         return $this->belongsTo(Timer::class);
     }
 
-    public function kursi(): BelongsTo
-    {
-        return $this->belongsTo(Kursi::class);
-    }
-
     public function penjual(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // tersedia = belum dipakai, berjalan = sedang terapi, selesai = waktu habis
+    public function sesis(): HasMany
+    {
+        return $this->hasMany(Sesi::class)->orderBy('nomor');
+    }
+
+    // Jumlah sesi yang sudah dipakai (pakai withCount('sesis') di query list agar hemat query)
+    protected function sesiTerpakai(): Attribute
+    {
+        return Attribute::get(
+            fn () => (int) ($this->getAttribute('sesis_count') ?? $this->sesis()->count())
+        );
+    }
+
+    protected function sisaSesi(): Attribute
+    {
+        return Attribute::get(fn () => max(0, $this->jumlah_sesi - $this->sesi_terpakai));
+    }
+
+    // aktif = masih bisa dipakai, habis = semua sesi terpakai, kedaluwarsa = lewat masa berlaku
     protected function status(): Attribute
     {
         return Attribute::get(function () {
-            if (! $this->dipakai_pada) {
-                return 'tersedia';
+            if ($this->sesi_terpakai >= $this->jumlah_sesi) {
+                return 'habis';
             }
 
-            return $this->selesai_pada?->isFuture() ? 'berjalan' : 'selesai';
+            if ($this->berlaku_sampai?->isPast()) {
+                return 'kedaluwarsa';
+            }
+
+            return 'aktif';
         });
     }
 
-    // Contoh: 90 => "1 jam 30 menit"
+    // Durasi tiap sesi. Contoh: 90 => "1 jam 30 menit"
     protected function durasiLabel(): Attribute
     {
         return Attribute::get(function () {
@@ -85,11 +107,15 @@ class Voucher extends Model
 
     public function scopeFilterStatus(Builder $query, ?string $status): Builder
     {
+        $hitung = '(select count(*) from sesis where sesis.voucher_id = vouchers.id)';
+
         return match ($status) {
-            'tersedia' => $query->whereNull('dipakai_pada'),
-            'berjalan' => $query->whereNotNull('dipakai_pada')->where('selesai_pada', '>', now()),
-            'selesai'  => $query->whereNotNull('dipakai_pada')->where('selesai_pada', '<=', now()),
-            default    => $query,
+            'aktif'       => $query->where('berlaku_sampai', '>=', now())
+                                   ->whereRaw("{$hitung} < vouchers.jumlah_sesi"),
+            'habis'       => $query->whereRaw("{$hitung} >= vouchers.jumlah_sesi"),
+            'kedaluwarsa' => $query->where('berlaku_sampai', '<', now())
+                                   ->whereRaw("{$hitung} < vouchers.jumlah_sesi"),
+            default       => $query,
         };
     }
 
@@ -108,40 +134,60 @@ class Voucher extends Model
         return $kode;
     }
 
-    // Pasien membeli voucher untuk satu timer.
+    // Pasien membeli paket: 30 sesi, berlaku 6 bulan sejak hari pembelian.
     public static function jual(Pasien $pasien, Timer $timer, User $penjual): self
     {
         return static::create([
-            'kode'         => static::buatKode(),
-            'pasien_id'    => $pasien->id,
-            'timer_id'     => $timer->id,
-            'user_id'      => $penjual->id,
-            'nama_timer'   => $timer->nama,
-            'durasi_menit' => $timer->durasi_menit,
+            'kode'           => static::buatKode(),
+            'pasien_id'      => $pasien->id,
+            'timer_id'       => $timer->id,
+            'user_id'        => $penjual->id,
+            'nama_timer'     => $timer->nama,
+            'durasi_menit'   => $timer->durasi_menit,
+            'jumlah_sesi'    => static::JUMLAH_SESI,
+            'berlaku_sampai' => now()->addMonthsNoOverflow(static::MASA_BERLAKU_BULAN)->endOfDay(),
         ]);
     }
 
-    // Pakai voucher di kursi kosong, hitung mundur dimulai sekarang.
-    public function pakaiDi(Kursi $kursi): void
+    // Pakai satu sesi di kursi kosong. Hitung mundur dimulai sekarang.
+    public function pakaiDi(Kursi $kursi, User $pegawai): Sesi
     {
-        DB::transaction(function () use ($kursi) {
+        return DB::transaction(function () use ($kursi, $pegawai) {
             // Kunci baris supaya dua pegawai tidak bisa memakai kursi/voucher yang sama bersamaan.
             $kursiKunci   = Kursi::whereKey($kursi->getKey())->lockForUpdate()->firstOrFail();
             $voucherKunci = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-            if ($voucherKunci->dipakai_pada) {
-                throw new DomainException('Voucher ini sudah dipakai.');
+            $terpakai = $voucherKunci->sesis()->count();
+
+            if ($terpakai >= $voucherKunci->jumlah_sesi) {
+                throw new DomainException('Semua ' . $voucherKunci->jumlah_sesi . ' sesi voucher ini sudah terpakai.');
             }
 
-            $sedangTerapi = static::with('kursi')
+            if ($voucherKunci->berlaku_sampai?->isPast()) {
+                throw new DomainException(
+                    'Voucher sudah kedaluwarsa pada ' . $voucherKunci->berlaku_sampai->locale('id')->translatedFormat('j F Y') . '.'
+                );
+            }
+
+            $sedangTerapi = Sesi::with('kursi')
                 ->where('pasien_id', $voucherKunci->pasien_id)
                 ->where('selesai_pada', '>', now())
                 ->first();
 
             if ($sedangTerapi) {
                 throw new DomainException(
-                    'Pasien ini masih sedang terapi di kursi ' . ($sedangTerapi->kursi?->no_kursi ?? '-') . '.'
+                    'Pasien ini masih sedang terapi di kursi ' . ($sedangTerapi->no_kursi ?? $sedangTerapi->kursi?->no_kursi ?? '-') . '.'
                 );
+            }
+
+            if (static::MAKS_SESI_PER_HARI !== null) {
+                $hariIni = Sesi::where('pasien_id', $voucherKunci->pasien_id)
+                    ->whereBetween('dimulai_pada', [now()->startOfDay(), now()->endOfDay()])
+                    ->count();
+
+                if ($hariIni >= static::MAKS_SESI_PER_HARI) {
+                    throw new DomainException('Pasien ini sudah mencapai batas ' . static::MAKS_SESI_PER_HARI . ' sesi untuk hari ini.');
+                }
             }
 
             if ($kursiKunci->sedangDipakai()) {
@@ -150,13 +196,17 @@ class Voucher extends Model
 
             $mulai = now();
 
-            $voucherKunci->update([
+            return $voucherKunci->sesis()->create([
+                'pasien_id'    => $voucherKunci->pasien_id,
                 'kursi_id'     => $kursiKunci->id,
-                'dipakai_pada' => $mulai,
+                'user_id'      => $pegawai->id,
+                'nomor'        => $terpakai + 1,
+                'no_kursi'     => $kursiKunci->no_kursi,
+                'nama_pegawai' => $pegawai->name,
+                'durasi_menit' => $voucherKunci->durasi_menit,
+                'dimulai_pada' => $mulai,
                 'selesai_pada' => $mulai->copy()->addMinutes($voucherKunci->durasi_menit),
             ]);
         });
-
-        $this->refresh();
     }
 }

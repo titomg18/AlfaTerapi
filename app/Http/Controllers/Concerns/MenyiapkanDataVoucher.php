@@ -16,15 +16,17 @@ trait MenyiapkanDataVoucher
         $status = (string) $request->query('status', '');
 
         return [
-            'vouchers' => Voucher::with(['pasien', 'kursi'])
+            'vouchers' => Voucher::with('pasien')
+                ->withCount('sesis')
                 ->cari($q)
                 ->filterStatus($status)
                 ->latest()
                 ->paginate(10)
                 ->withQueryString(),
 
-            // Kursi + voucher yang sedang berjalan (jika ada), urut natural
-            'kursis' => Kursi::with('sesiAktif.pasien')
+            // Kursi + sesi yang sedang berjalan (jika ada), urut natural.
+            // Dipakai untuk menentukan kursi kosong di pop-up "Pakai".
+            'kursis' => Kursi::with('sesiAktif')
                 ->get()
                 ->sortBy('no_kursi', SORT_NATURAL | SORT_FLAG_CASE)
                 ->values(),

@@ -15,6 +15,11 @@ class Pasien extends Model
         return $this->hasMany(Voucher::class);
     }
 
+    public function sesis(): HasMany
+    {
+        return $this->hasMany(Sesi::class);
+    }
+
     // Pencarian berdasarkan nama atau no. telepon: Pasien::cari($q)
     public function scopeCari(Builder $query, ?string $q): Builder
     {

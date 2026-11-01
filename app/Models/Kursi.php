@@ -10,19 +10,19 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[Fillable(['no_kursi', 'keterangan'])]
 class Kursi extends Model
 {
-    public function vouchers(): HasMany
+    public function sesis(): HasMany
     {
-        return $this->hasMany(Voucher::class);
+        return $this->hasMany(Sesi::class);
     }
 
-    // Voucher yang sedang berjalan di kursi ini (null = kursi kosong)
+    // Sesi yang sedang berjalan di kursi ini (null = kursi kosong)
     public function sesiAktif(): HasOne
     {
-        return $this->hasOne(Voucher::class)->where('selesai_pada', '>', now());
+        return $this->hasOne(Sesi::class)->where('selesai_pada', '>', now());
     }
 
     public function sedangDipakai(): bool
     {
-        return $this->vouchers()->where('selesai_pada', '>', now())->exists();
+        return $this->sesis()->where('selesai_pada', '>', now())->exists();
     }
 }

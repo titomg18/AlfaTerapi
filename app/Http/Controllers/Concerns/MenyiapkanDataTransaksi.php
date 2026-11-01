@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Concerns;
 
-use App\Models\Voucher;
+use App\Models\Sesi;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -27,15 +27,15 @@ trait MenyiapkanDataTransaksi
             [$dari, $sampai] = [$sampai, $dari];
         }
 
-        // Transaksi = voucher yang sudah dipakai dan timernya sudah habis.
+        // Transaksi = sesi terapi yang timernya sudah habis.
         // Tanggal yang dipakai untuk filter adalah tanggal terapi dimulai.
-        $base = Voucher::filterStatus('selesai')
+        $base = Sesi::selesai()
             ->cari($q)
-            ->when($dari, fn ($query) => $query->where('dipakai_pada', '>=', Carbon::parse($dari)->startOfDay()))
-            ->when($sampai, fn ($query) => $query->where('dipakai_pada', '<=', Carbon::parse($sampai)->endOfDay()));
+            ->when($dari, fn ($query) => $query->where('dimulai_pada', '>=', Carbon::parse($dari)->startOfDay()))
+            ->when($sampai, fn ($query) => $query->where('dimulai_pada', '<=', Carbon::parse($sampai)->endOfDay()));
 
         return [
-            'transaksis'  => (clone $base)->with('pasien')->latest('dipakai_pada')->paginate(15)->withQueryString(),
+            'transaksis'  => (clone $base)->with(['pasien', 'voucher'])->latest('dimulai_pada')->paginate(15)->withQueryString(),
             'totalSesi'   => (clone $base)->count(),
             'totalMenit'  => (int) (clone $base)->sum('durasi_menit'),
             'totalPasien' => (clone $base)->distinct()->count('pasien_id'),

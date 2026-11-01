@@ -10,12 +10,16 @@
         ->map(fn ($p) => ['id' => $p->id, 'nama' => $p->nama, 'telp' => $p->no_telepon])
         ->values();
 
-    $statusLabel = ['tersedia' => 'Tersedia', 'berjalan' => 'Berjalan', 'selesai' => 'Selesai'];
+    $statusLabel = ['aktif' => 'Aktif', 'habis' => 'Habis', 'kedaluwarsa' => 'Kedaluwarsa'];
     $statusBadge = [
-        'tersedia' => 'bg-accent-soft text-accent-dark',
-        'berjalan' => 'bg-[#FFF3D6] text-[#8A5A00]',
-        'selesai'  => 'bg-[#EEF3F2] text-muted',
+        'aktif'       => 'bg-accent-soft text-accent-dark',
+        'habis'       => 'bg-[#EEF3F2] text-muted',
+        'kedaluwarsa' => 'bg-[#FBEFE7] text-warn',
     ];
+
+    $paketSesi     = \App\Models\Voucher::JUMLAH_SESI;
+    $masaBulan     = \App\Models\Voucher::MASA_BERLAKU_BULAN;
+    $berlakuContoh = now()->addMonthsNoOverflow($masaBulan)->locale('id')->translatedFormat('j F Y');
 @endphp
 
 {{-- Notifikasi --}}
@@ -34,41 +38,6 @@
         {{ $message }}
     </div>
 @enderror
-
-{{-- Status kursi --}}
-<section class="rounded-[14px] border border-line bg-white p-5">
-    <div class="mb-3.5 flex items-center justify-between">
-        <h2 class="m-0 text-base font-bold">Status Kursi</h2>
-        <span class="text-[13px] text-muted">{{ $kursiKosong->count() }} kosong dari {{ $kursis->count() }} kursi</span>
-    </div>
-
-    @if ($kursis->isEmpty())
-        <p class="m-0 py-4 text-center text-muted">
-            Belum ada kursi.
-            {{ $canDelete ? 'Tambahkan lewat menu Kursi.' : 'Minta admin menambahkan kursi.' }}
-        </p>
-    @else
-        <div class="grid grid-cols-5 gap-3 max-[1100px]:grid-cols-3 max-[820px]:grid-cols-2">
-            @foreach ($kursis as $k)
-                @php $s = $k->sesiAktif; @endphp
-                @if ($s)
-                    <div class="rounded-xl bg-accent-soft px-4 py-3.5">
-                        <div class="text-sm font-semibold">Kursi {{ $k->no_kursi }}</div>
-                        <div class="mt-1 text-[22px] font-bold tabular-nums text-accent-dark"
-                             data-end="{{ $s->selesai_pada->toIso8601String() }}"></div>
-                        <div class="truncate text-xs text-accent-dark" title="{{ $s->pasien?->nama }}">{{ $s->pasien?->nama }}</div>
-                    </div>
-                @else
-                    <div class="rounded-xl border border-line bg-surface px-4 py-3.5">
-                        <div class="text-sm font-semibold">Kursi {{ $k->no_kursi }}</div>
-                        <div class="mt-1 text-[22px] font-bold text-muted">Kosong</div>
-                        <div class="truncate text-xs text-muted">{{ $k->keterangan ?: 'siap dipakai' }}</div>
-                    </div>
-                @endif
-            @endforeach
-        </div>
-    @endif
-</section>
 
 {{-- Daftar voucher --}}
 <section class="min-w-0 rounded-[14px] border border-line bg-white p-5">
@@ -104,78 +73,93 @@
     </div>
 
     <div class="overflow-x-auto">
-        <table class="w-full min-w-[720px] border-collapse text-[13.5px]">
+        <table class="w-full min-w-[900px] border-collapse text-[13.5px]">
             <thead>
                 <tr>
                     <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Kode</th>
                     <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Pasien</th>
                     <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Timer</th>
+                    <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Sesi</th>
+                    <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Berlaku sampai</th>
                     <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Status</th>
-                    <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Dibeli</th>
                     <th class="border-b border-line p-2 text-right text-xs font-semibold text-muted">Aksi</th>
                 </tr>
             </thead>
             <tbody class="[&>tr:last-child>td]:border-b-0">
                 @forelse ($vouchers as $v)
-                    @php $st = $v->status; @endphp
+                    @php
+                        $st     = $v->status;
+                        $pakai  = $v->sesi_terpakai;
+                        $persen = $v->jumlah_sesi > 0 ? round($pakai / $v->jumlah_sesi * 100) : 0;
+                        $sisaHari = ($st === 'aktif' && $v->berlaku_sampai)
+                            ? (int) now()->startOfDay()->diffInDays($v->berlaku_sampai->copy()->startOfDay())
+                            : null;
+                    @endphp
                     <tr>
                         <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 font-mono font-semibold">{{ $v->kode }}</td>
                         <td class="border-b border-[#EEF3F2] px-2 py-3 font-semibold">{{ $v->pasien?->nama ?? '-' }}</td>
                         <td class="border-b border-[#EEF3F2] px-2 py-3">
                             {{ $v->nama_timer }}
-                            <div class="text-xs text-muted">{{ $v->durasi_label }}</div>
+                            <div class="text-xs text-muted">{{ $v->durasi_label }} / sesi</div>
+                        </td>
+                        <td class="border-b border-[#EEF3F2] px-2 py-3">
+                            <div class="font-semibold tabular-nums">{{ $pakai }} / {{ $v->jumlah_sesi }}</div>
+                            <div class="mt-1 h-1.5 w-24 rounded-full bg-[#E3ECEA]">
+                                <span class="block h-1.5 rounded-full bg-accent" style="width: {{ $persen }}%"></span>
+                            </div>
+                            <div class="mt-0.5 text-xs text-muted">sisa {{ $v->sisa_sesi }}</div>
+                        </td>
+                        <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3">
+                            {{ $v->berlaku_sampai?->locale('id')->translatedFormat('j M Y') ?? '-' }}
+                            @if ($sisaHari !== null && $sisaHari <= 14)
+                                <div class="text-xs font-semibold text-warn">
+                                    {{ $sisaHari === 0 ? 'berakhir hari ini' : 'sisa ' . $sisaHari . ' hari' }}
+                                </div>
+                            @endif
                         </td>
                         <td class="border-b border-[#EEF3F2] px-2 py-3">
                             <span class="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $statusBadge[$st] }}">
                                 {{ $statusLabel[$st] }}
                             </span>
-                            @if ($st === 'berjalan')
-                                <div class="mt-1 text-xs text-muted">
-                                    Kursi {{ $v->kursi?->no_kursi ?? '-' }} · sisa
-                                    <span class="font-semibold tabular-nums text-ink" data-end="{{ $v->selesai_pada->toIso8601String() }}"></span>
-                                </div>
-                            @elseif ($st === 'selesai')
-                                <div class="mt-1 text-xs text-muted">
-                                    Kursi {{ $v->kursi?->no_kursi ?? 'dihapus' }} · selesai {{ $v->selesai_pada->locale('id')->translatedFormat('H.i') }}
-                                </div>
-                            @endif
-                        </td>
-                        <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 text-muted">
-                            {{ $v->created_at?->locale('id')->translatedFormat('j M Y, H.i') }}
                         </td>
                         <td class="border-b border-[#EEF3F2] px-2 py-3">
                             <div class="flex justify-end gap-2">
-                                @if ($st === 'tersedia')
+                                @if ($st === 'aktif')
                                     <button type="button" data-pakai
                                             data-id="{{ $v->id }}"
                                             data-kode="{{ $v->kode }}"
                                             data-pasien="{{ $v->pasien?->nama }}"
                                             data-timer="{{ $v->nama_timer }} ({{ $v->durasi_label }})"
+                                            data-sesi="{{ $pakai + 1 }}"
+                                            data-total="{{ $v->jumlah_sesi }}"
                                             class="inline-flex min-h-[36px] items-center rounded-lg bg-accent px-3 text-[13px] font-semibold text-white transition-colors hover:bg-accent-dark">
                                         Pakai
                                     </button>
+                                @endif
 
-                                    @if ($canDelete)
-                                        <form method="POST" action="{{ route('admin.voucher.destroy', $v) }}"
-                                              data-confirm="Hapus voucher {{ $v->kode }}? Tindakan ini tidak bisa dibatalkan."
-                                              onsubmit="return confirm(this.dataset.confirm)">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    class="inline-flex min-h-[36px] items-center rounded-lg border border-line bg-white px-3 text-[13px] font-semibold text-warn transition-colors hover:bg-[#FBEFE7]">
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    @endif
-                                @else
-                                    <span class="text-muted">-</span>
+                                <a href="{{ route($prefix . '.voucher.kartu', $v) }}" target="_blank" rel="noopener"
+                                   class="inline-flex min-h-[36px] items-center rounded-lg border border-line bg-white px-3 text-[13px] font-semibold text-accent-dark transition-colors hover:bg-accent-soft">
+                                    Kartu
+                                </a>
+
+                                @if ($canDelete && $pakai === 0)
+                                    <form method="POST" action="{{ route('admin.voucher.destroy', $v) }}"
+                                          data-confirm="Hapus voucher {{ $v->kode }}? Tindakan ini tidak bisa dibatalkan."
+                                          onsubmit="return confirm(this.dataset.confirm)">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="inline-flex min-h-[36px] items-center rounded-lg border border-line bg-white px-3 text-[13px] font-semibold text-warn transition-colors hover:bg-[#FBEFE7]">
+                                            Hapus
+                                        </button>
+                                    </form>
                                 @endif
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-2 py-6 text-center text-muted">
+                        <td colspan="7" class="px-2 py-6 text-center text-muted">
                             @if ($q !== '' || $status !== '')
                                 Tidak ada voucher yang cocok dengan pencarian.
                             @else
@@ -209,6 +193,12 @@
             </button>
         </div>
 
+        <p class="m-0 rounded-[10px] bg-accent-soft px-3 py-2 text-xs text-accent-dark">
+            Satu voucher berisi <span class="font-semibold">{{ $paketSesi }} sesi terapi</span>,
+            berlaku <span class="font-semibold">{{ $masaBulan }} bulan</span> sejak pembelian
+            (dibeli hari ini: sampai {{ $berlakuContoh }}).
+        </p>
+
         <div>
             <label for="cariPasien" class="mb-1.5 block text-[13px] font-semibold">Pasien</label>
             <input id="cariPasien" type="search" placeholder="Cari nama / no. telepon" autocomplete="off"
@@ -226,7 +216,7 @@
         </div>
 
         <div>
-            <label for="timer_id" class="mb-1.5 block text-[13px] font-semibold">Timer (durasi terapi)</label>
+            <label for="timer_id" class="mb-1.5 block text-[13px] font-semibold">Timer (durasi tiap sesi)</label>
             @if ($timers->isEmpty())
                 <p class="m-0 rounded-[10px] bg-[#FBEFE7] px-3 py-2 text-xs text-warn">
                     Belum ada timer. Minta admin membuat timer terlebih dahulu.
@@ -259,7 +249,7 @@
     </form>
 </dialog>
 
-{{-- Pop-up pakai voucher di kursi kosong --}}
+{{-- Pop-up pakai 1 sesi di kursi kosong --}}
 <dialog id="pakaiModal" aria-labelledby="pakaiTitle"
         class="m-auto max-h-[90vh] w-[min(92vw,460px)] overflow-y-auto rounded-[14px] border border-line bg-white p-0 text-ink shadow-2xl backdrop:bg-ink/40">
 
@@ -279,11 +269,17 @@
             <div id="pvKode" class="font-mono font-semibold"></div>
             <div id="pvPasien" class="font-semibold"></div>
             <div id="pvTimer" class="text-muted"></div>
+            <div id="pvSesi" class="mt-1 font-semibold text-accent-dark"></div>
         </div>
 
         <fieldset class="m-0 border-0 p-0">
             <legend class="mb-1.5 p-0 text-[13px] font-semibold">Pilih kursi kosong</legend>
-            @if ($kursiKosong->isEmpty())
+            @if ($kursis->isEmpty())
+                <p class="m-0 rounded-[10px] bg-[#FBEFE7] px-3 py-2 text-xs text-warn">
+                    Belum ada kursi.
+                    {{ $canDelete ? 'Tambahkan lewat menu Kursi.' : 'Minta admin menambahkan kursi.' }}
+                </p>
+            @elseif ($kursiKosong->isEmpty())
                 <p class="m-0 rounded-[10px] bg-[#FBEFE7] px-3 py-2 text-xs text-warn">
                     Semua kursi sedang dipakai. Tunggu sampai ada kursi yang kosong.
                 </p>
@@ -303,7 +299,7 @@
             @endif
         </fieldset>
 
-        <p class="m-0 text-xs text-muted">Hitung mundur dimulai saat tombol "Mulai Terapi" ditekan.</p>
+        <p class="m-0 text-xs text-muted">Satu sesi terpakai dan hitung mundur dimulai saat tombol "Mulai Terapi" ditekan.</p>
 
         <div class="flex flex-col gap-2 sm:flex-row-reverse">
             <button type="submit" @disabled($kursiKosong->isEmpty())
@@ -320,38 +316,6 @@
 
 <script>
 (function () {
-    // ===== Hitung mundur =====
-    const pad = n => String(n).padStart(2, '0');
-    const fmt = s => {
-        const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), d = s % 60;
-        return h ? h + ':' + pad(m) + ':' + pad(d) : pad(m) + ':' + pad(d);
-    };
-    const counters = Array.from(document.querySelectorAll('[data-end]'))
-        .map(el => ({ el, end: Date.parse(el.dataset.end), alive: false }));
-    let reloadScheduled = false;
-
-    function tick() {
-        const now = Date.now();
-        counters.forEach(c => {
-            const left = Math.ceil((c.end - now) / 1000);
-            if (left > 0) {
-                c.el.textContent = fmt(left);
-                c.alive = true;
-            } else {
-                c.el.textContent = 'Selesai';
-                // Muat ulang sekali saat waktu habis supaya status kursi diperbarui
-                // (hanya jika hitung mundur sempat berjalan di halaman ini).
-                if (c.alive && !reloadScheduled) {
-                    reloadScheduled = true;
-                    setTimeout(() => {
-                        if (!document.querySelector('dialog[open]')) location.reload();
-                    }, 2000);
-                }
-            }
-        });
-    }
-    if (counters.length) { tick(); setInterval(tick, 1000); }
-
     // ===== Pop-up beli voucher =====
     const beli = {
         modal: document.getElementById('beliModal'),
@@ -410,11 +374,12 @@
 
     // ===== Pop-up pakai voucher =====
     const pakai = {
-        modal: document.getElementById('pakaiModal'),
-        form:  document.getElementById('pakaiForm'),
-        kode:  document.getElementById('pvKode'),
+        modal:  document.getElementById('pakaiModal'),
+        form:   document.getElementById('pakaiForm'),
+        kode:   document.getElementById('pvKode'),
         pasien: document.getElementById('pvPasien'),
-        timer: document.getElementById('pvTimer'),
+        timer:  document.getElementById('pvTimer'),
+        sesi:   document.getElementById('pvSesi'),
     };
     const pakaiUrlTpl = @json(route($prefix . '.voucher.pakai', ['voucher' => '__ID__']));
 
@@ -424,6 +389,7 @@
         pakai.kode.textContent = btn.dataset.kode;
         pakai.pasien.textContent = btn.dataset.pasien;
         pakai.timer.textContent = btn.dataset.timer;
+        pakai.sesi.textContent = 'Sesi ke-' + btn.dataset.sesi + ' dari ' + btn.dataset.total;
         pakai.modal.showModal();
     }));
 

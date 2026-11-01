@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PegawaiController;
 use App\Http\Controllers\Admin\KursiController;
 use App\Http\Controllers\Admin\TimerController;
@@ -33,7 +34,7 @@ Route::get('/', function () {
     return redirect()->route($home);
 });
 
-// Khusus role pegawai (bisa daftar & edit pasien, jual & pakai voucher, lihat transaksi)
+// Khusus role pegawai (daftar & edit pasien, jual & pakai voucher, lihat transaksi)
 Route::middleware(['auth', 'role:pegawai'])->prefix('pegawai')->group(function () {
     Route::get('/dashboard', fn () => view('pegawai.dashboard'))->name('pegawai.dashboard');
 
@@ -44,6 +45,7 @@ Route::middleware(['auth', 'role:pegawai'])->prefix('pegawai')->group(function (
     Route::get('/voucher', [PegawaiVoucherController::class, 'index'])->name('pegawai.voucher.index');
     Route::post('/voucher', [PegawaiVoucherController::class, 'store'])->name('pegawai.voucher.store');
     Route::post('/voucher/{voucher}/pakai', [PegawaiVoucherController::class, 'pakai'])->name('pegawai.voucher.pakai');
+    Route::get('/voucher/{voucher}/kartu', [PegawaiVoucherController::class, 'kartu'])->name('pegawai.voucher.kartu');
 
     // Laporan pemakaian voucher (hanya lihat)
     Route::get('/transaksi', [PegawaiTransaksiController::class, 'index'])->name('pegawai.transaksi.index');
@@ -51,7 +53,7 @@ Route::middleware(['auth', 'role:pegawai'])->prefix('pegawai')->group(function (
 
 // Khusus role admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', fn () => view('admin.dashboard'))->name('admin.dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     // CRUD pengguna (tambah & edit lewat pop-up)
     Route::get('/pegawai', [PegawaiController::class, 'index'])->name('admin.pegawai.index');
@@ -77,10 +79,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::put('/timer/{timer}', [TimerController::class, 'update'])->name('admin.timer.update');
     Route::delete('/timer/{timer}', [TimerController::class, 'destroy'])->name('admin.timer.destroy');
 
-    // Voucher: jual, pakai di kursi, hapus (hanya yang belum dipakai)
+    // Voucher: jual, pakai 1 sesi, cetak kartu, hapus (hanya yang belum pernah dipakai)
     Route::get('/voucher', [AdminVoucherController::class, 'index'])->name('admin.voucher.index');
     Route::post('/voucher', [AdminVoucherController::class, 'store'])->name('admin.voucher.store');
     Route::post('/voucher/{voucher}/pakai', [AdminVoucherController::class, 'pakai'])->name('admin.voucher.pakai');
+    Route::get('/voucher/{voucher}/kartu', [AdminVoucherController::class, 'kartu'])->name('admin.voucher.kartu');
     Route::delete('/voucher/{voucher}', [AdminVoucherController::class, 'destroy'])->name('admin.voucher.destroy');
 
     // Laporan pemakaian voucher (hanya lihat)
