@@ -1,13 +1,13 @@
 @php
     // Menu sidebar: [label, url, pola route aktif, path svg]
     $menu = [
-        ['Dashboard', route('admin.dashboard'),       'admin/dashboard*', '<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>'],
-        ['Pasien',    route('admin.pasien.index'),    'admin/pasien*',    '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'],
-        ['Kursi',     route('admin.kursi.index'),     'admin/kursi*',     '<path d="M6 3v10h12v8M6 13v8M18 13V9"/>'],
-        ['Timer',     route('admin.timer.index'),     'admin/timer*',     '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>'],
-        ['Voucher',   route('admin.voucher.index'),   'admin/voucher*',   '<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/>'],
-        ['Transaksi', route('admin.transaksi.index'), 'admin/transaksi*', '<path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h4"/>'],
-        ['Pegawai',   route('admin.pegawai.index'),   'admin/pegawai*',   '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-5 7-5s7 1.5 7 5M17 4.5a3.5 3.5 0 0 1 0 7M22 20c0-2.5-1.5-4-4-4.6"/>'],
+        ['Dashboard', route('admin.dashboard'),       '*admin/dashboard*', '<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>'],
+        ['Pasien',    route('admin.pasien.index'),    '*admin/pasien*',    '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'],
+        ['Kursi',     route('admin.kursi.index'),     '*admin/kursi*',     '<path d="M6 3v10h12v8M6 13v8M18 13V9"/>'],
+        ['Timer',     route('admin.timer.index'),     '*admin/timer*',     '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>'],
+        ['Voucher',   route('admin.voucher.index'),   '*admin/voucher*',   '<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/>'],
+        ['Transaksi', route('admin.transaksi.index'), '*admin/transaksi*', '<path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h4"/>'],
+        ['Pegawai',   route('admin.pegawai.index'),   '*admin/pegawai*',   '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-5 7-5s7 1.5 7 5M17 4.5a3.5 3.5 0 0 1 0 7M22 20c0-2.5-1.5-4-4-4.6"/>'],
     ];
 @endphp
 

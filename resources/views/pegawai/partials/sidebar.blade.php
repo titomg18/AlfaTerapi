@@ -1,12 +1,12 @@
 @php
     // Menu sidebar khusus Pegawai: [label, url, pola route aktif, path svg]
     $menu = [
-        ['Dashboard', route('pegawai.dashboard'),       'pegawai/dashboard*', '<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>'],
-        ['Pasien',    route('pegawai.pasien.index'),    'pegawai/pasien*',    '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'],
-        ['Kursi',     route('pegawai.kursi.index'),     'pegawai/kursi*',     '<path d="M6 3v10h12v8M6 13v8M18 13V9"/>'],
-        ['Timer',     route('pegawai.timer.index'),     'pegawai/timer*',     '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>'],
-        ['Voucher',   route('pegawai.voucher.index'),   'pegawai/voucher*',   '<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/>'],
-        ['Transaksi', route('pegawai.transaksi.index'), 'pegawai/transaksi*', '<path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h4"/>'],
+        ['Dashboard', route('pegawai.dashboard'),       '*pegawai/dashboard*', '<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>'],
+        ['Pasien',    route('pegawai.pasien.index'),    '*pegawai/pasien*',    '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'],
+        ['Kursi',     route('pegawai.kursi.index'),     '*pegawai/kursi*',     '<path d="M6 3v10h12v8M6 13v8M18 13V9"/>'],
+        ['Timer',     route('pegawai.timer.index'),     '*pegawai/timer*',     '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>'],
+        ['Voucher',   route('pegawai.voucher.index'),   '*pegawai/voucher*',   '<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/>'],
+        ['Transaksi', route('pegawai.transaksi.index'), '*pegawai/transaksi*', '<path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h4"/>'],
     ];
 @endphp
 

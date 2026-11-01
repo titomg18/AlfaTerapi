@@ -37,14 +37,21 @@ class PegawaiPagesTest extends TestCase
 
     public function test_guest_is_redirected_to_login(): void
     {
-        $this->get('/pegawai/dashboard')->assertRedirect('/login');
-        $this->get('/pegawai/kursi')->assertRedirect('/login');
-        $this->get('/pegawai/timer')->assertRedirect('/login');
+        $this->get('/althe/pegawai/dashboard')->assertRedirect('/althe/login');
+        $this->get('/althe/pegawai/kursi')->assertRedirect('/althe/login');
+        $this->get('/althe/pegawai/timer')->assertRedirect('/althe/login');
+    }
+
+    public function test_legacy_routes_redirect_to_althe_prefix(): void
+    {
+        $this->get('/login')->assertRedirect('/althe/login');
+        $this->get('/admin')->assertRedirect('/althe/admin/dashboard');
+        $this->get('/pegawai')->assertRedirect('/althe/pegawai/dashboard');
     }
 
     public function test_pegawai_can_access_dashboard_with_sidebar_and_footer(): void
     {
-        $response = $this->actingAs($this->pegawai)->get('/pegawai/dashboard');
+        $response = $this->actingAs($this->pegawai)->get('/althe/pegawai/dashboard');
 
         $response->assertStatus(200);
         $response->assertSee('Dashboard Pegawai');
@@ -57,7 +64,7 @@ class PegawaiPagesTest extends TestCase
     {
         $kursi = Kursi::create(['no_kursi' => '1A', 'keterangan' => 'Dekat jendela']);
 
-        $response = $this->actingAs($this->pegawai)->get('/pegawai/kursi');
+        $response = $this->actingAs($this->pegawai)->get('/althe/pegawai/kursi');
 
         $response->assertStatus(200);
         $response->assertSee('Kursi 1A');
@@ -67,15 +74,15 @@ class PegawaiPagesTest extends TestCase
         $response->assertDontSee('admin.kursi.destroy');
 
         // Pegawai cannot create or delete kursi (route does not exist or method not allowed)
-        $this->actingAs($this->pegawai)->post('/pegawai/kursi', ['no_kursi' => '1B'])->assertStatus(405);
-        $this->actingAs($this->pegawai)->delete('/pegawai/kursi/'.$kursi->id)->assertNotFound();
+        $this->actingAs($this->pegawai)->post('/althe/pegawai/kursi', ['no_kursi' => '1B'])->assertStatus(405);
+        $this->actingAs($this->pegawai)->delete('/althe/pegawai/kursi/'.$kursi->id)->assertNotFound();
     }
 
     public function test_pegawai_timer_is_read_only(): void
     {
         $timer = Timer::create(['nama' => '30 Menit', 'durasi_menit' => 30]);
 
-        $response = $this->actingAs($this->pegawai)->get('/pegawai/timer');
+        $response = $this->actingAs($this->pegawai)->get('/althe/pegawai/timer');
 
         $response->assertStatus(200);
         $response->assertSee('30 Menit');
@@ -83,14 +90,14 @@ class PegawaiPagesTest extends TestCase
         $response->assertDontSee('+ Buat Timer');
 
         // Pegawai cannot create or delete timer (route does not exist or method not allowed)
-        $this->actingAs($this->pegawai)->post('/pegawai/timer', ['nama' => '45 Menit', 'durasi_menit' => 45])->assertStatus(405);
-        $this->actingAs($this->pegawai)->delete('/pegawai/timer/'.$timer->id)->assertNotFound();
+        $this->actingAs($this->pegawai)->post('/althe/pegawai/timer', ['nama' => '45 Menit', 'durasi_menit' => 45])->assertStatus(405);
+        $this->actingAs($this->pegawai)->delete('/althe/pegawai/timer/'.$timer->id)->assertNotFound();
     }
 
     public function test_pegawai_can_access_pasien_and_voucher(): void
     {
-        $this->actingAs($this->pegawai)->get('/pegawai/pasien')->assertStatus(200);
-        $this->actingAs($this->pegawai)->get('/pegawai/voucher')->assertStatus(200);
+        $this->actingAs($this->pegawai)->get('/althe/pegawai/pasien')->assertStatus(200);
+        $this->actingAs($this->pegawai)->get('/althe/pegawai/voucher')->assertStatus(200);
     }
 
     public function test_transaksi_page_renders_completed_sessions_properly(): void
@@ -123,7 +130,7 @@ class PegawaiPagesTest extends TestCase
             'selesai_pada' => now()->subMinutes(30),
         ]);
 
-        $response = $this->actingAs($this->pegawai)->get('/pegawai/transaksi');
+        $response = $this->actingAs($this->pegawai)->get('/althe/pegawai/transaksi');
 
         $response->assertStatus(200);
         $response->assertSee('Budi Santoso');
@@ -137,9 +144,9 @@ class PegawaiPagesTest extends TestCase
     {
         $pasien = Pasien::create(['nama' => 'Pasien Baru', 'no_telepon' => '0899999999', 'alamat' => 'Jl. Baru']);
 
-        $response = $this->actingAs($this->pegawai)->delete('/pegawai/pasien/'.$pasien->id);
+        $response = $this->actingAs($this->pegawai)->delete('/althe/pegawai/pasien/'.$pasien->id);
 
-        $response->assertRedirect('/pegawai/pasien');
+        $response->assertRedirect('/althe/pegawai/pasien');
         $this->assertDatabaseMissing('pasiens', ['id' => $pasien->id]);
     }
 
@@ -158,9 +165,9 @@ class PegawaiPagesTest extends TestCase
             'berlaku_sampai' => now()->addMonths(6),
         ]);
 
-        $response = $this->actingAs($this->pegawai)->delete('/pegawai/pasien/'.$pasien->id);
+        $response = $this->actingAs($this->pegawai)->delete('/althe/pegawai/pasien/'.$pasien->id);
 
-        $response->assertRedirect('/pegawai/pasien');
+        $response->assertRedirect('/althe/pegawai/pasien');
         $this->assertDatabaseHas('pasiens', ['id' => $pasien->id]);
     }
 }
