@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Masuk - Admin Alpha Theraphy</title>
+    <title>Masuk - Alpha Theraphy</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -43,17 +43,15 @@
 @include('partials.toast')
 <div class="w-full max-w-[420px]">
 
-    <div class="flex flex-col items-center justify-center gap-2 mb-6 text-center">
-        <img src="{{ asset('images/logo.jpg') }}" alt="Alpha Theraphy" class="h-16 w-16 rounded-2xl object-contain border border-line bg-white shadow-sm p-1">
-        <div>
-            <div class="font-bold text-2xl text-accent-dark">Alpha Theraphy</div>
-            <div class="text-xs font-semibold tracking-wider text-muted">アルファ・セラピー</div>
+    <div class="bg-white border border-line rounded-2xl px-7 py-8 shadow-sm">
+        {{-- Logo di dalam card --}}
+        <div class="flex flex-col items-center justify-center gap-2 mb-6 text-center">
+            <img src="{{ asset('images/logo.jpg') }}" alt="Alpha Theraphy" class="h-16 w-16 rounded-2xl object-contain border border-line bg-white shadow-sm p-1">
+            <div>
+                <div class="font-bold text-2xl text-accent-dark leading-tight">Alpha Theraphy</div>
+                <div class="text-xs font-semibold tracking-wider text-muted">アルファ・セラピー</div>
+            </div>
         </div>
-    </div>
-
-    <div class="bg-white border border-line rounded-2xl px-7 py-8">
-        <h1 class="m-0 text-[22px] font-bold">Masuk ke Dashboard</h1>
-        <p class="mt-1.5 mb-6 text-sm text-muted">Silakan masuk dengan username admin Anda.</p>
 
         @if (session('status'))
             <div class="bg-accent-soft border border-[#BAE6FD] text-accent-dark rounded-[10px] px-3.5 py-3 text-[13.5px] mb-[18px]">
