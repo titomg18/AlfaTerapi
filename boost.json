@@ -1,0 +1,11 @@
+{
+    "agents": [
+        "antigravity"
+    ],
+    "guidelines": true,
+    "mcp": false,
+    "nightwatch": false,
+    "packages": [],
+    "sail": false,
+    "skills": []
+}
