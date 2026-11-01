@@ -11,12 +11,18 @@
     ];
 @endphp
 
+{{-- Notifikasi Pop-up (Toast) --}}
+@include('partials.toast')
+
 {{-- Sidebar --}}
 <nav class="sticky top-0 z-20 flex h-screen w-[232px] flex-shrink-0 flex-col gap-1.5 self-start overflow-y-auto border-r border-line bg-white px-4 py-6
             max-[820px]:static max-[820px]:h-auto max-[820px]:w-auto max-[820px]:flex-row max-[820px]:overflow-x-auto max-[820px]:self-auto">
     <div class="flex items-center gap-2.5 px-2 pb-[22px] max-[820px]:pb-0">
-        <div class="flex h-9 w-9 items-center justify-center rounded-[10px] bg-accent font-bold text-white">A</div>
-        <div class="whitespace-nowrap text-base font-bold">Alfa Terapi</div>
+        <img src="{{ asset('images/logo.jpg') }}" alt="Alpha Theraphy" class="h-10 w-10 flex-shrink-0 rounded-[10px] border border-line bg-white object-contain shadow-sm p-0.5">
+        <div class="min-w-0">
+            <div class="truncate text-[15px] font-extrabold leading-tight text-accent-dark">Alpha Theraphy</div>
+            <div class="text-[10px] font-semibold tracking-wider text-muted">アルファ・セラピー</div>
+        </div>
     </div>
 
     @foreach ($menu as [$label, $href, $pattern, $icon])
@@ -24,7 +30,7 @@
            class="flex items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-[11px] text-sm transition-colors
                   {{ request()->is($pattern)
                         ? 'bg-accent-soft font-semibold text-accent-dark'
-                        : 'text-[#3D5654] hover:bg-surface' }}">
+                        : 'text-[#334E68] hover:bg-surface' }}">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">{!! $icon !!}</svg>
             {{ $label }}
         </a>

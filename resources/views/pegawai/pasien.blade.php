@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Pasien - Alfa Terapi</title>
+    <title>Pasien - Alpha Theraphy</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,14 +18,14 @@
                 extend: {
                     colors: {
                         accent: {
-                            DEFAULT: '#0F766E',
-                            dark:    '#0B5A54',
-                            soft:    '#E6F3F1',
+                            DEFAULT: '#0284C7',
+                            dark:    '#0D2D56',
+                            soft:    '#E0F2FE',
                         },
-                        surface: '#F3F7F6',
-                        line:    '#DCE7E5',
-                        ink:     '#12302E',
-                        muted:   '#4F6664',
+                        surface: '#F4F7FB',
+                        line:    '#D4E2EE',
+                        ink:     '#0F1E36',
+                        muted:   '#4A607A',
                         warn:    '#B4531A',
                     },
                     fontFamily: {
@@ -63,11 +63,16 @@
 <div class="flex min-h-screen max-[820px]:flex-col">
 
     {{-- Sidebar --}}
-    <nav class="flex w-[232px] flex-shrink-0 flex-col gap-1.5 border-r border-line bg-white px-4 py-6
-                max-[820px]:w-auto max-[820px]:flex-row max-[820px]:overflow-x-auto">
+    @include('partials.toast')
+
+    <nav class="sticky top-0 z-20 flex h-screen w-[232px] flex-shrink-0 flex-col gap-1.5 self-start overflow-y-auto border-r border-line bg-white px-4 py-6
+                max-[820px]:static max-[820px]:h-auto max-[820px]:w-auto max-[820px]:flex-row max-[820px]:overflow-x-auto max-[820px]:self-auto">
         <div class="flex items-center gap-2.5 px-2 pb-[22px] max-[820px]:pb-0">
-            <div class="flex h-9 w-9 items-center justify-center rounded-[10px] bg-accent font-bold text-white">A</div>
-            <div class="whitespace-nowrap text-base font-bold">Alfa Terapi</div>
+            <img src="{{ asset('images/logo.jpg') }}" alt="Alpha Theraphy" class="h-10 w-10 flex-shrink-0 rounded-[10px] border border-line bg-white object-contain shadow-sm p-0.5">
+            <div class="min-w-0">
+                <div class="truncate text-[15px] font-extrabold leading-tight text-accent-dark">Alpha Theraphy</div>
+                <div class="text-[10px] font-semibold tracking-wider text-muted">アルファ・セラピー</div>
+            </div>
         </div>
 
         @foreach ($menu as [$label, $href, $pattern, $icon])
@@ -75,7 +80,7 @@
                class="flex items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-[11px] text-sm transition-colors
                       {{ request()->is($pattern)
                             ? 'bg-accent-soft font-semibold text-accent-dark'
-                            : 'text-[#3D5654] hover:bg-surface' }}">
+                            : 'text-[#334E68] hover:bg-surface' }}">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">{!! $icon !!}</svg>
                 {{ $label }}
             </a>
@@ -92,7 +97,7 @@
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 <div class="flex items-center gap-2.5 rounded-xl border border-line bg-white py-1.5 pl-1.5 pr-3.5">
-                    <div class="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#CFE6E2] text-[13px] font-bold text-accent-dark">{{ $initials }}</div>
+                    <div class="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#D0E6F8] text-[13px] font-bold text-accent-dark">{{ $initials }}</div>
                     <div class="text-[13px] leading-[1.3]">
                         <div class="font-semibold">{{ $userName }}</div>
                         <div class="text-muted">{{ ucfirst($userRole) }}</div>
@@ -114,19 +119,7 @@
             </div>
         </header>
 
-        {{-- Notifikasi --}}
-        @if (session('success'))
-            <div role="status" class="rounded-xl border border-accent/30 bg-accent-soft px-4 py-3 text-sm font-semibold text-accent-dark">
-                {{ session('success') }}
-            </div>
-        @endif
-        @if (session('error'))
-            <div role="alert" class="rounded-xl border border-warn/30 bg-[#FBEFE7] px-4 py-3 text-sm font-semibold text-warn">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        {{-- Daftar pasien --}}
+{{-- Daftar pasien --}}
         <section class="min-w-0 rounded-[14px] border border-line bg-white p-5">
             <div class="mb-3.5 flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -166,15 +159,15 @@
                     <tbody class="[&>tr:last-child>td]:border-b-0">
                         @forelse ($pasiens as $p)
                             <tr>
-                                <td class="border-b border-[#EEF3F2] px-2 py-3 font-semibold">{{ $p->nama }}</td>
-                                <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3">{{ $p->no_telepon }}</td>
-                                <td class="border-b border-[#EEF3F2] px-2 py-3">
+                                <td class="border-b border-[#EDF2F7] px-2 py-3 font-semibold">{{ $p->nama }}</td>
+                                <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3">{{ $p->no_telepon }}</td>
+                                <td class="border-b border-[#EDF2F7] px-2 py-3">
                                     <div class="line-clamp-2 max-w-[280px]" title="{{ $p->alamat }}">{{ $p->alamat }}</div>
                                 </td>
-                                <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 text-muted">
+                                <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 text-muted">
                                     {{ $p->created_at?->locale('id')->translatedFormat('j M Y') }}
                                 </td>
-                                <td class="border-b border-[#EEF3F2] px-2 py-3">
+                                <td class="border-b border-[#EDF2F7] px-2 py-3">
                                     <div class="flex justify-end gap-2">
                                         {{-- Edit: data dibaca JS untuk mengisi pop-up. Pegawai tidak bisa menghapus. --}}
                                         <button type="button" data-edit

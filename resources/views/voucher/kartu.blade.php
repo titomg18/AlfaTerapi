@@ -16,12 +16,12 @@
             theme: {
                 extend: {
                     colors: {
-                        accent: { DEFAULT: '#0F766E', dark: '#0B5A54', soft: '#E6F3F1' },
+                        accent: { DEFAULT: '#0284C7', dark: '#0D2D56', soft: '#E0F2FE' },
                         kartu:  { DEFAULT: '#1D4E9E', soft: '#DCE9F8' },
-                        surface: '#F3F7F6',
-                        line:    '#DCE7E5',
-                        ink:     '#12302E',
-                        muted:   '#4F6664',
+                        surface: '#F4F7FB',
+                        line:    '#D4E2EE',
+                        ink:     '#0F1E36',
+                        muted:   '#4A607A',
                     },
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],

@@ -39,7 +39,9 @@ class LoginController extends Controller
                     ->onlyInput('username');
             }
 
-            return redirect()->route($home);
+            return redirect()
+                ->route($home)
+                ->with('success', 'Berhasil masuk! Selamat datang kembali, '.$request->user()->name.'.');
         }
 
         return back()
@@ -53,6 +55,8 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()
+            ->route('login')
+            ->with('success', 'Anda telah berhasil keluar dari akun.');
     }
 }

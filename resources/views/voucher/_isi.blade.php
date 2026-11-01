@@ -13,7 +13,7 @@
     $statusLabel = ['aktif' => 'Aktif', 'habis' => 'Habis', 'kedaluwarsa' => 'Kedaluwarsa'];
     $statusBadge = [
         'aktif'       => 'bg-accent-soft text-accent-dark',
-        'habis'       => 'bg-[#EEF3F2] text-muted',
+        'habis'       => 'bg-[#EDF2F7] text-muted',
         'kedaluwarsa' => 'bg-[#FBEFE7] text-warn',
     ];
 
@@ -22,17 +22,6 @@
     $berlakuContoh = now()->addMonthsNoOverflow($masaBulan)->locale('id')->translatedFormat('j F Y');
 @endphp
 
-{{-- Notifikasi --}}
-@if (session('success'))
-    <div role="status" class="rounded-xl border border-accent/30 bg-accent-soft px-4 py-3 text-sm font-semibold text-accent-dark">
-        {{ session('success') }}
-    </div>
-@endif
-@if (session('error'))
-    <div role="alert" class="rounded-xl border border-warn/30 bg-[#FBEFE7] px-4 py-3 text-sm font-semibold text-warn">
-        {{ session('error') }}
-    </div>
-@endif
 @error('kursi_id')
     <div role="alert" class="rounded-xl border border-warn/30 bg-[#FBEFE7] px-4 py-3 text-sm font-semibold text-warn">
         {{ $message }}
@@ -96,20 +85,20 @@
                             : null;
                     @endphp
                     <tr>
-                        <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 font-mono font-semibold">{{ $v->kode }}</td>
-                        <td class="border-b border-[#EEF3F2] px-2 py-3 font-semibold">{{ $v->pasien?->nama ?? '-' }}</td>
-                        <td class="border-b border-[#EEF3F2] px-2 py-3">
+                        <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 font-mono font-semibold">{{ $v->kode }}</td>
+                        <td class="border-b border-[#EDF2F7] px-2 py-3 font-semibold">{{ $v->pasien?->nama ?? '-' }}</td>
+                        <td class="border-b border-[#EDF2F7] px-2 py-3">
                             {{ $v->nama_timer }}
                             <div class="text-xs text-muted">{{ $v->durasi_label }} / sesi</div>
                         </td>
-                        <td class="border-b border-[#EEF3F2] px-2 py-3">
+                        <td class="border-b border-[#EDF2F7] px-2 py-3">
                             <div class="font-semibold tabular-nums">{{ $pakai }} / {{ $v->jumlah_sesi }}</div>
-                            <div class="mt-1 h-1.5 w-24 rounded-full bg-[#E3ECEA]">
+                            <div class="mt-1 h-1.5 w-24 rounded-full bg-[#DDE8F2]">
                                 <span class="block h-1.5 rounded-full bg-accent" style="width: {{ $persen }}%"></span>
                             </div>
                             <div class="mt-0.5 text-xs text-muted">sisa {{ $v->sisa_sesi }}</div>
                         </td>
-                        <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3">
+                        <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3">
                             {{ $v->berlaku_sampai?->locale('id')->translatedFormat('j M Y') ?? '-' }}
                             @if ($sisaHari !== null && $sisaHari <= 14)
                                 <div class="text-xs font-semibold text-warn">
@@ -117,12 +106,12 @@
                                 </div>
                             @endif
                         </td>
-                        <td class="border-b border-[#EEF3F2] px-2 py-3">
+                        <td class="border-b border-[#EDF2F7] px-2 py-3">
                             <span class="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $statusBadge[$st] }}">
                                 {{ $statusLabel[$st] }}
                             </span>
                         </td>
-                        <td class="border-b border-[#EEF3F2] px-2 py-3">
+                        <td class="border-b border-[#EDF2F7] px-2 py-3">
                             <div class="flex justify-end gap-2">
                                 @if ($st === 'aktif')
                                     <button type="button" data-pakai

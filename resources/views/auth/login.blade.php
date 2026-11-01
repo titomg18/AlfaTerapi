@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Masuk - Admin Alfa Terapi</title>
+    <title>Masuk - Admin Alpha Theraphy</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,14 +18,14 @@
                 extend: {
                     colors: {
                         accent: {
-                            DEFAULT: '#0F766E',
-                            dark: '#0B5A54',
-                            soft: '#E6F3F1',
+                            DEFAULT: '#0284C7',
+                            dark: '#0D2D56',
+                            soft: '#E0F2FE',
                         },
-                        page: '#F3F7F6',
-                        line: '#DCE7E5',
-                        ink: '#12302E',
-                        muted: '#4F6664',
+                        page: '#F4F7FB',
+                        line: '#D4E2EE',
+                        ink: '#0F1E36',
+                        muted: '#4A607A',
                         danger: {
                             DEFAULT: '#B42318',
                             soft: '#FEF3F2',
@@ -40,11 +40,15 @@
     </script>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6 font-sans bg-page text-ink">
+@include('partials.toast')
 <div class="w-full max-w-[420px]">
 
-    <div class="flex items-center justify-center gap-3 mb-6">
-        <div class="w-11 h-11 rounded-xl bg-accent text-white flex items-center justify-center font-bold text-xl">A</div>
-        <div class="font-bold text-xl">Alfa Terapi</div>
+    <div class="flex flex-col items-center justify-center gap-2 mb-6 text-center">
+        <img src="{{ asset('images/logo.jpg') }}" alt="Alpha Theraphy" class="h-16 w-16 rounded-2xl object-contain border border-line bg-white shadow-sm p-1">
+        <div>
+            <div class="font-bold text-2xl text-accent-dark">Alpha Theraphy</div>
+            <div class="text-xs font-semibold tracking-wider text-muted">アルファ・セラピー</div>
+        </div>
     </div>
 
     <div class="bg-white border border-line rounded-2xl px-7 py-8">
@@ -52,7 +56,7 @@
         <p class="mt-1.5 mb-6 text-sm text-muted">Silakan masuk dengan username admin Anda.</p>
 
         @if (session('status'))
-            <div class="bg-accent-soft border border-[#B7DAD5] text-accent-dark rounded-[10px] px-3.5 py-3 text-[13.5px] mb-[18px]">
+            <div class="bg-accent-soft border border-[#BAE6FD] text-accent-dark rounded-[10px] px-3.5 py-3 text-[13.5px] mb-[18px]">
                 {{ session('status') }}
             </div>
         @endif
@@ -140,7 +144,7 @@
         </form>
     </div>
 
-    <div class="text-center mt-5 text-[12.5px] text-muted">&copy; {{ date('Y') }} Alfa Terapi. Hak cipta dilindungi.</div>
+    <div class="text-center mt-5 text-[12.5px] text-muted">&copy; {{ date('Y') }} Alpha Theraphy. Hak cipta dilindungi.</div>
 </div>
 
 <script>

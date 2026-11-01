@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Dashboard Admin Alfa Terapi</title>
+    <title>Dashboard Admin Alpha Theraphy</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,14 +18,14 @@
                 extend: {
                     colors: {
                         accent: {
-                            DEFAULT: '#0F766E',
-                            dark:    '#0B5A54',
-                            soft:    '#E6F3F1',
+                            DEFAULT: '#0284C7',
+                            dark:    '#0D2D56',
+                            soft:    '#E0F2FE',
                         },
-                        surface: '#F3F7F6',
-                        line:    '#DCE7E5',
-                        ink:     '#12302E',
-                        muted:   '#4F6664',
+                        surface: '#F4F7FB',
+                        line:    '#D4E2EE',
+                        ink:     '#0F1E36',
+                        muted:   '#4A607A',
                         warn:    '#B4531A',
                     },
                     fontFamily: {
@@ -72,7 +72,7 @@
                     + Daftarkan Pasien
                 </a>
                 <div class="flex items-center gap-2.5 rounded-xl border border-line bg-white py-1.5 pl-1.5 pr-3.5">
-                    <div class="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#CFE6E2] text-[13px] font-bold text-accent-dark">{{ $initials }}</div>
+                    <div class="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#D0E6F8] text-[13px] font-bold text-accent-dark">{{ $initials }}</div>
                     <div class="text-[13px] leading-[1.3]">
                         <div class="font-semibold">{{ $userName }}</div>
                         <div class="text-muted">{{ ucfirst($userRole) }}</div>
@@ -177,14 +177,14 @@
                         <tbody class="[&>tr:last-child>td]:border-b-0">
                             @forelse ($transaksiTerbaru as $t)
                                 <tr>
-                                    <td class="border-b border-[#EEF3F2] px-2 py-3 font-semibold">{{ $t->pasien?->nama ?? '-' }}</td>
-                                    <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 tabular-nums">
+                                    <td class="border-b border-[#EDF2F7] px-2 py-3 font-semibold">{{ $t->pasien?->nama ?? '-' }}</td>
+                                    <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 tabular-nums">
                                         <span class="font-semibold">{{ $t->nomor }}</span>
                                         <span class="text-muted">/ {{ $t->voucher?->jumlah_sesi ?? 30 }}</span>
                                     </td>
-                                    <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3">{{ $t->no_kursi ? 'Kursi ' . $t->no_kursi : '-' }}</td>
-                                    <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3">{{ $t->durasi_menit }} menit</td>
-                                    <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 text-muted">
+                                    <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3">{{ $t->no_kursi ? 'Kursi ' . $t->no_kursi : '-' }}</td>
+                                    <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3">{{ $t->durasi_menit }} menit</td>
+                                    <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 text-muted">
                                         {{ $t->dimulai_pada->locale('id')->translatedFormat('j M Y, H.i') }}
                                     </td>
                                 </tr>
@@ -218,7 +218,7 @@
                                 <span class="truncate font-semibold">{{ $v->pasien?->nama ?? '-' }}</span>
                                 <span class="whitespace-nowrap text-muted">sisa {{ $sisa }} dari {{ $v->jumlah_sesi }}</span>
                             </div>
-                            <div class="h-2 rounded-full bg-[#E3ECEA]">
+                            <div class="h-2 rounded-full bg-[#DDE8F2]">
                                 <span class="block h-2 rounded-full bg-warn" style="width: {{ $persen }}%"></span>
                             </div>
                             @if ($sisaHari !== null && $sisaHari <= 14)

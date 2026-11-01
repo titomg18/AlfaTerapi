@@ -123,24 +123,24 @@
             <tbody class="[&>tr:last-child>td]:border-b-0">
                 @forelse ($transaksis as $v)
                     <tr>
-                        <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 font-semibold">
+                        <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 font-semibold">
                             {{ $v->dipakai_pada->locale('id')->translatedFormat('j M Y') }}
                         </td>
-                        <td class="border-b border-[#EEF3F2] px-2 py-3 font-semibold">{{ $v->pasien?->nama ?? '-' }}</td>
-                        <td class="border-b border-[#EEF3F2] px-2 py-3">
+                        <td class="border-b border-[#EDF2F7] px-2 py-3 font-semibold">{{ $v->pasien?->nama ?? '-' }}</td>
+                        <td class="border-b border-[#EDF2F7] px-2 py-3">
                             {{ $v->nama_timer }}
                             <div class="text-xs text-muted">{{ $v->durasi_label }}</div>
                         </td>
-                        <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3">
+                        <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3">
                             {{ $v->no_kursi ? 'Kursi ' . $v->no_kursi : '-' }}
                         </td>
-                        <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 tabular-nums text-muted">
+                        <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 tabular-nums text-muted">
                             {{ $v->dipakai_pada->format('H.i') }} - {{ $v->selesai_pada->format('H.i') }}
                             @unless ($v->selesai_pada->isSameDay($v->dipakai_pada))
                                 <span class="text-xs">(+1 hari)</span>
                             @endunless
                         </td>
-                        <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 font-mono text-[13px]">{{ $v->kode }}</td>
+                        <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 font-mono text-[13px]">{{ $v->kode }}</td>
                     </tr>
                 @empty
                     <tr>

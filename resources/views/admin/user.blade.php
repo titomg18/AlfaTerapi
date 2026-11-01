@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Pengguna - Alfa Terapi</title>
+    <title>Pengguna - Alpha Theraphy</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,14 +18,14 @@
                 extend: {
                     colors: {
                         accent: {
-                            DEFAULT: '#0F766E',
-                            dark:    '#0B5A54',
-                            soft:    '#E6F3F1',
+                            DEFAULT: '#0284C7',
+                            dark:    '#0D2D56',
+                            soft:    '#E0F2FE',
                         },
-                        surface: '#F3F7F6',
-                        line:    '#DCE7E5',
-                        ink:     '#12302E',
-                        muted:   '#4F6664',
+                        surface: '#F4F7FB',
+                        line:    '#D4E2EE',
+                        ink:     '#0F1E36',
+                        muted:   '#4A607A',
                         warn:    '#B4531A',
                     },
                     fontFamily: {
@@ -67,7 +67,7 @@
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 <div class="flex items-center gap-2.5 rounded-xl border border-line bg-white py-1.5 pl-1.5 pr-3.5">
-                    <div class="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#CFE6E2] text-[13px] font-bold text-accent-dark">{{ $initials }}</div>
+                    <div class="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#D0E6F8] text-[13px] font-bold text-accent-dark">{{ $initials }}</div>
                     <div class="text-[13px] leading-[1.3]">
                         <div class="font-semibold">{{ $userName }}</div>
                         <div class="text-muted">{{ ucfirst($userRole) }}</div>
@@ -89,19 +89,7 @@
             </div>
         </header>
 
-        {{-- Notifikasi --}}
-        @if (session('success'))
-            <div role="status" class="rounded-xl border border-accent/30 bg-accent-soft px-4 py-3 text-sm font-semibold text-accent-dark">
-                {{ session('success') }}
-            </div>
-        @endif
-        @if (session('error'))
-            <div role="alert" class="rounded-xl border border-warn/30 bg-[#FBEFE7] px-4 py-3 text-sm font-semibold text-warn">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        {{-- Daftar pengguna --}}
+{{-- Daftar pengguna --}}
         <section class="min-w-0 rounded-[14px] border border-line bg-white p-5">
             <div class="mb-3.5 flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -128,29 +116,29 @@
                     <tbody class="[&>tr:last-child>td]:border-b-0">
                         @forelse ($users as $u)
                             <tr>
-                                <td class="border-b border-[#EEF3F2] px-2 py-3 font-semibold">
+                                <td class="border-b border-[#EDF2F7] px-2 py-3 font-semibold">
                                     {{ $u->name }}
                                     @if ($u->id === $user->id)
                                         <span class="ml-1 text-xs font-medium text-muted">(Anda)</span>
                                     @endif
                                 </td>
-                                <td class="border-b border-[#EEF3F2] px-2 py-3">{{ $u->username }}</td>
-                                <td class="border-b border-[#EEF3F2] px-2 py-3">
+                                <td class="border-b border-[#EDF2F7] px-2 py-3">{{ $u->username }}</td>
+                                <td class="border-b border-[#EDF2F7] px-2 py-3">
                                     @if ($u->role)
                                         <span class="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold
                                                      {{ $u->role->name === 'admin'
                                                             ? 'bg-accent-soft text-accent-dark'
-                                                            : 'bg-[#EEF3F2] text-muted' }}">
+                                                            : 'bg-[#EDF2F7] text-muted' }}">
                                             {{ $u->role->label }}
                                         </span>
                                     @else
                                         <span class="text-xs text-warn">Belum ada role</span>
                                     @endif
                                 </td>
-                                <td class="border-b border-[#EEF3F2] px-2 py-3 text-muted">
+                                <td class="border-b border-[#EDF2F7] px-2 py-3 text-muted">
                                     {{ $u->created_at?->locale('id')->translatedFormat('j M Y') }}
                                 </td>
-                                <td class="border-b border-[#EEF3F2] px-2 py-3">
+                                <td class="border-b border-[#EDF2F7] px-2 py-3">
                                     <div class="flex justify-end gap-2">
                                         {{-- Edit: data dibaca JS untuk mengisi pop-up --}}
                                         <button type="button" data-edit

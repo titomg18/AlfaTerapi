@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Transaksi - Alfa Terapi</title>
+    <title>Transaksi - Alpha Theraphy</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,14 +18,14 @@
                 extend: {
                     colors: {
                         accent: {
-                            DEFAULT: '#0F766E',
-                            dark:    '#0B5A54',
-                            soft:    '#E6F3F1',
+                            DEFAULT: '#0284C7',
+                            dark:    '#0D2D56',
+                            soft:    '#E0F2FE',
                         },
-                        surface: '#F3F7F6',
-                        line:    '#DCE7E5',
-                        ink:     '#12302E',
-                        muted:   '#4F6664',
+                        surface: '#F4F7FB',
+                        line:    '#D4E2EE',
+                        ink:     '#0F1E36',
+                        muted:   '#4A607A',
                         warn:    '#B4531A',
                     },
                     fontFamily: {
@@ -71,7 +71,7 @@
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 <div class="flex items-center gap-2.5 rounded-xl border border-line bg-white py-1.5 pl-1.5 pr-3.5">
-                    <div class="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#CFE6E2] text-[13px] font-bold text-accent-dark">{{ $initials }}</div>
+                    <div class="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#D0E6F8] text-[13px] font-bold text-accent-dark">{{ $initials }}</div>
                     <div class="text-[13px] leading-[1.3]">
                         <div class="font-semibold">{{ $userName }}</div>
                         <div class="text-muted">{{ ucfirst($userRole) }}</div>
@@ -166,26 +166,26 @@
                     <tbody class="[&>tr:last-child>td]:border-b-0">
                         @forelse ($transaksis as $s)
                             <tr>
-                                <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 font-semibold">
+                                <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 font-semibold">
                                     {{ $s->dimulai_pada->locale('id')->translatedFormat('j M Y') }}
                                 </td>
-                                <td class="border-b border-[#EEF3F2] px-2 py-3 font-semibold">{{ $s->pasien?->nama ?? '-' }}</td>
-                                <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 tabular-nums">
+                                <td class="border-b border-[#EDF2F7] px-2 py-3 font-semibold">{{ $s->pasien?->nama ?? '-' }}</td>
+                                <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 tabular-nums">
                                     <span class="font-semibold">{{ $s->nomor }}</span>
                                     <span class="text-muted">/ {{ $s->voucher?->jumlah_sesi ?? 30 }}</span>
                                 </td>
-                                <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3">
+                                <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3">
                                     {{ $s->no_kursi ? 'Kursi ' . $s->no_kursi : '-' }}
                                 </td>
-                                <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 tabular-nums text-muted">
+                                <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 tabular-nums text-muted">
                                     {{ $s->dimulai_pada->format('H.i') }} - {{ $s->selesai_pada->format('H.i') }}
                                     @unless ($s->selesai_pada->isSameDay($s->dimulai_pada))
                                         <span class="text-xs">(+1 hari)</span>
                                     @endunless
                                     <div class="text-xs">{{ $s->durasi_menit }} menit</div>
                                 </td>
-                                <td class="border-b border-[#EEF3F2] px-2 py-3">{{ $s->nama_pegawai ?? '-' }}</td>
-                                <td class="whitespace-nowrap border-b border-[#EEF3F2] px-2 py-3 font-mono text-[13px]">
+                                <td class="border-b border-[#EDF2F7] px-2 py-3">{{ $s->nama_pegawai ?? '-' }}</td>
+                                <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 font-mono text-[13px]">
                                     {{ $s->voucher?->kode ?? '-' }}
                                 </td>
                             </tr>
