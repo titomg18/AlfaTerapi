@@ -42,6 +42,13 @@ class KursiController extends Controller
     // DELETE
     public function destroy(Kursi $kursi)
     {
+        // Jangan hapus kursi yang sedang dipakai pasien
+        if ($kursi->sedangDipakai()) {
+            return redirect()
+                ->route('admin.kursi.index')
+                ->with('error', 'Kursi "' . $kursi->no_kursi . '" sedang dipakai dan tidak bisa dihapus.');
+        }
+
         $no = $kursi->no_kursi;
         $kursi->delete();
 

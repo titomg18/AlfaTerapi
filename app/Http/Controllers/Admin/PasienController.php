@@ -45,6 +45,13 @@ class PasienController extends Controller
     // DELETE (hanya admin)
     public function destroy(Pasien $pasien)
     {
+        // Riwayat voucher tidak boleh hilang
+        if ($pasien->vouchers()->exists()) {
+            return redirect()
+                ->route('admin.pasien.index')
+                ->with('error', 'Pasien "' . $pasien->nama . '" tidak bisa dihapus karena sudah memiliki voucher.');
+        }
+
         $nama = $pasien->nama;
         $pasien->delete();
 
