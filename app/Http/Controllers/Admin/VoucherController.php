@@ -27,6 +27,11 @@ class VoucherController extends Controller
     public function store(JualVoucherRequest $request)
     {
         $pasien = Pasien::findOrFail($request->validated('pasien_id'));
+
+        if (! $pasien->isDisetujui()) {
+            return back()->with('error', 'Voucher hanya dapat dibuat untuk pasien yang sudah disetujui (ACC).');
+        }
+
         $timer = Timer::findOrFail($request->validated('timer_id'));
 
         $voucher = Voucher::jual($pasien, $timer, $request->user());

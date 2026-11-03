@@ -88,16 +88,19 @@
             </div>
         </header>
 
-{{-- Daftar pasien --}}
+        {{-- Daftar pasien --}}
         <section class="min-w-0 rounded-[14px] border border-line bg-white p-5">
-            <div class="mb-3.5 flex flex-wrap items-center justify-between gap-3">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h2 class="m-0 text-base font-bold">Daftar Pasien</h2>
-                    <span class="text-[13px] text-muted">{{ $pasiens->total() }} pasien</span>
+                    <span class="text-[13px] text-muted">{{ $pasiens->total() }} pasien ditampilkan</span>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3">
                     <form method="GET" action="{{ route('admin.pasien.index') }}" class="flex gap-2">
+                        @if ($status !== '')
+                            <input type="hidden" name="status" value="{{ $status }}">
+                        @endif
                         <input type="search" name="q" value="{{ $q }}" placeholder="Cari nama / no. telepon"
                                aria-label="Cari pasien"
                                class="min-h-[44px] w-[220px] rounded-[10px] border border-line bg-white px-3 text-sm outline-none transition-colors focus:border-accent focus:ring-2 focus:ring-accent/20 max-[520px]:w-full">
@@ -114,13 +117,51 @@
                 </div>
             </div>
 
+            {{-- Filter Status Tabs --}}
+            <div class="mb-4 flex flex-wrap items-center gap-2 border-b border-line pb-3.5 text-xs">
+                @php
+                    $tabs = [
+                        ['key' => '', 'label' => 'Semua', 'count' => $counts['total']],
+                        ['key' => 'pending', 'label' => 'Menunggu ACC', 'count' => $counts['pending']],
+                        ['key' => 'disetujui', 'label' => 'Disetujui', 'count' => $counts['disetujui']],
+                        ['key' => 'ditolak', 'label' => 'Ditolak', 'count' => $counts['ditolak']],
+                    ];
+                @endphp
+                @foreach ($tabs as $tab)
+                    @php $isActive = $status === $tab['key']; @endphp
+                    <a href="{{ route('admin.pasien.index', array_filter(['status' => $tab['key'], 'q' => $q])) }}"
+                       class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-semibold transition
+                              {{ $isActive ? 'bg-accent text-white shadow-sm' : 'bg-surface text-ink hover:bg-slate-200' }}">
+                        <span>{{ $tab['label'] }}</span>
+                        <span class="rounded-full px-1.5 py-0.5 text-[10px] font-bold {{ $isActive ? 'bg-white/20 text-white' : ($tab['key'] === 'pending' && $tab['count'] > 0 ? 'bg-amber-500 text-white' : 'bg-white text-muted border border-line') }}">
+                            {{ $tab['count'] }}
+                        </span>
+                    </a>
+                @endforeach
+            </div>
+
+            {{-- Notifikasi jika ada pendaftaran mandiri pending --}}
+            @if ($counts['pending'] > 0 && $status !== 'pending')
+                <div class="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+                    <div class="flex items-center gap-2">
+                        <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-200 font-bold text-amber-800">!</span>
+                        <span>Ada <strong>{{ $counts['pending'] }}</strong> pendaftaran pasien mandiri dari tamu yang menunggu persetujuan (ACC).</span>
+                    </div>
+                    <a href="{{ route('admin.pasien.index', array_filter(['status' => 'pending', 'q' => $q])) }}"
+                       class="font-bold underline hover:text-amber-950">
+                        Buka Pasien Menunggu ACC &rarr;
+                    </a>
+                </div>
+            @endif
+
             <div class="overflow-x-auto">
-                <table class="w-full min-w-[640px] border-collapse text-[13.5px]">
+                <table class="w-full min-w-[720px] border-collapse text-[13.5px]">
                     <thead>
                         <tr>
                             <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Nama</th>
                             <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">No. Telepon</th>
                             <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Alamat</th>
+                            <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Status</th>
                             <th class="border-b border-line p-2 text-left text-xs font-semibold text-muted">Terdaftar</th>
                             <th class="border-b border-line p-2 text-right text-xs font-semibold text-muted">Aksi</th>
                         </tr>
@@ -131,29 +172,74 @@
                                 <td class="border-b border-[#EDF2F7] px-2 py-3 font-semibold">{{ $p->nama }}</td>
                                 <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3">{{ $p->no_telepon }}</td>
                                 <td class="border-b border-[#EDF2F7] px-2 py-3">
-                                    <div class="line-clamp-2 max-w-[280px]" title="{{ $p->alamat }}">{{ $p->alamat }}</div>
+                                    <div class="line-clamp-2 max-w-[240px]" title="{{ $p->alamat }}">{{ $p->alamat }}</div>
+                                </td>
+                                <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3">
+                                    @if ($p->status === 'pending')
+                                        <span class="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-800">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                            Menunggu ACC
+                                        </span>
+                                    @elseif ($p->status === 'disetujui')
+                                        <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                            Disetujui
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1.5 rounded-full border border-rose-300 bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-800">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+                                            Ditolak
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="whitespace-nowrap border-b border-[#EDF2F7] px-2 py-3 text-muted">
                                     {{ $p->created_at?->locale('id')->translatedFormat('j M Y') }}
                                 </td>
                                 <td class="border-b border-[#EDF2F7] px-2 py-3">
-                                    <div class="flex justify-end gap-2">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        {{-- Tombol ACC jika belum disetujui --}}
+                                        @if ($p->status !== 'disetujui')
+                                            <form method="POST" action="{{ route('admin.pasien.approve', $p) }}"
+                                                  data-confirm="Setujui (ACC) pasien {{ $p->nama }}? Pasien akan dapat membeli dan menggunakan voucher terapi.">
+                                                @csrf
+                                                <button type="submit" title="Setujui (ACC) Pasien"
+                                                        class="inline-flex min-h-[34px] items-center gap-1 rounded-lg bg-emerald-600 px-3 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                                    ACC
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        {{-- Tombol Tolak jika berstatus pending --}}
+                                        @if ($p->status === 'pending')
+                                            <form method="POST" action="{{ route('admin.pasien.reject', $p) }}"
+                                                  data-confirm="Tolak pendaftaran pasien {{ $p->nama }}?">
+                                                @csrf
+                                                <button type="submit" title="Tolak Pendaftaran"
+                                                        class="inline-flex min-h-[34px] items-center gap-1 rounded-lg border border-rose-300 bg-white px-2.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-50">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                                    Tolak
+                                                </button>
+                                            </form>
+                                        @endif
+
                                         {{-- Edit: data dibaca JS untuk mengisi pop-up --}}
                                         <button type="button" data-edit
                                                 data-id="{{ $p->id }}"
                                                 data-nama="{{ $p->nama }}"
                                                 data-alamat="{{ $p->alamat }}"
                                                 data-telepon="{{ $p->no_telepon }}"
-                                                class="inline-flex min-h-[36px] items-center rounded-lg border border-line bg-white px-3 text-[13px] font-semibold text-accent-dark transition-colors hover:bg-accent-soft">
+                                                class="inline-flex min-h-[34px] items-center rounded-lg border border-line bg-white px-2.5 text-xs font-semibold text-accent-dark transition hover:bg-accent-soft">
                                             Edit
                                         </button>
 
+                                        {{-- Hapus --}}
                                         <form method="POST" action="{{ route('admin.pasien.destroy', $p) }}"
                                               data-confirm="Hapus pasien {{ $p->nama }}? Tindakan ini tidak bisa dibatalkan.">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
-                                                    class="inline-flex min-h-[36px] items-center rounded-lg border border-line bg-white px-3 text-[13px] font-semibold text-warn transition-colors hover:bg-[#FBEFE7]">
+                                                    class="inline-flex min-h-[34px] items-center rounded-lg border border-line bg-white px-2.5 text-xs font-semibold text-warn transition hover:bg-[#FBEFE7]">
                                                 Hapus
                                             </button>
                                         </form>
@@ -162,11 +248,15 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-2 py-6 text-center text-muted">
+                                <td colspan="6" class="px-2 py-8 text-center text-muted">
                                     @if ($q !== '')
                                         Tidak ada pasien yang cocok dengan "{{ $q }}".
+                                    @elseif ($status === 'pending')
+                                        Tidak ada pendaftaran pasien yang sedang menunggu persetujuan (ACC).
+                                    @elseif ($status === 'ditolak')
+                                        Tidak ada pasien berstatus ditolak.
                                     @else
-                                        Belum ada pasien. Klik "Daftarkan Pasien" untuk menambahkan.
+                                        Belum ada pasien. Klik "+ Daftarkan Pasien" untuk menambahkan.
                                     @endif
                                 </td>
                             </tr>

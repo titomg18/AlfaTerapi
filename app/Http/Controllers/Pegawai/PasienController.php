@@ -5,35 +5,55 @@ namespace App\Http\Controllers\Pegawai;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PasienRequest;
 use App\Models\Pasien;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class PasienController extends Controller
 {
-    // READ
-    public function index(Request $request)
+    /**
+     * Tampilkan daftar pasien beserta filter status dan pencarian.
+     */
+    public function index(Request $request): View
     {
         $q = trim((string) $request->query('q', ''));
+        $status = trim((string) $request->query('status', ''));
+
+        $counts = [
+            'total' => Pasien::count(),
+            'pending' => Pasien::pending()->count(),
+            'disetujui' => Pasien::disetujui()->count(),
+            'ditolak' => Pasien::ditolak()->count(),
+        ];
 
         $pasiens = Pasien::cari($q)
+            ->filterStatus($status)
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
-        return view('pegawai.pasien', compact('pasiens', 'q'));
+        return view('pegawai.pasien', compact('pasiens', 'q', 'status', 'counts'));
     }
 
-    // CREATE
-    public function store(PasienRequest $request)
+    /**
+     * Daftarkan pasien baru oleh pegawai (otomatis berstatus disetujui).
+     */
+    public function store(PasienRequest $request): RedirectResponse
     {
-        $pasien = Pasien::create($request->validated());
+        $pasien = Pasien::create([
+            ...$request->validated(),
+            'status' => Pasien::STATUS_DISETUJUI,
+        ]);
 
         return redirect()
             ->route('pegawai.pasien.index')
             ->with('success', 'Pasien "'.$pasien->nama.'" berhasil didaftarkan.');
     }
 
-    // UPDATE
-    public function update(PasienRequest $request, Pasien $pasien)
+    /**
+     * Perbarui data pasien.
+     */
+    public function update(PasienRequest $request, Pasien $pasien): RedirectResponse
     {
         $pasien->update($request->validated());
 
@@ -42,10 +62,38 @@ class PasienController extends Controller
             ->with('success', 'Data pasien "'.$pasien->nama.'" berhasil diperbarui.');
     }
 
-    // DELETE
-    public function destroy(Pasien $pasien)
+    /**
+     * Setujui (ACC) pendaftaran pasien dari tamu.
+     */
+    public function approve(Pasien $pasien): RedirectResponse
     {
-        // Riwayat voucher tidak boleh hilang
+        $pasien->update(['status' => Pasien::STATUS_DISETUJUI]);
+
+        return back()->with('success', 'Pasien "'.$pasien->nama.'" berhasil disetujui (ACC).');
+    }
+
+    /**
+     * Tolak pendaftaran pasien.
+     */
+    public function reject(Request $request, Pasien $pasien): RedirectResponse
+    {
+        if ($pasien->vouchers()->exists()) {
+            return back()->with('error', 'Pasien "'.$pasien->nama.'" tidak bisa ditolak karena sudah memiliki voucher.');
+        }
+
+        $pasien->update([
+            'status' => Pasien::STATUS_DITOLAK,
+            'catatan_penolakan' => $request->input('catatan_penolakan'),
+        ]);
+
+        return back()->with('success', 'Pendaftaran pasien "'.$pasien->nama.'" telah ditolak.');
+    }
+
+    /**
+     * Hapus data pasien (hanya jika belum memiliki riwayat voucher).
+     */
+    public function destroy(Pasien $pasien): RedirectResponse
+    {
         if ($pasien->vouchers()->exists()) {
             return redirect()
                 ->route('pegawai.pasien.index')

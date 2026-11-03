@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
 use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Guest\DashboardController as GuestDashboardController;
+use App\Http\Controllers\Guest\RegisterController as GuestRegisterController;
 use App\Http\Controllers\Pegawai\DashboardController as PegawaiDashboardController;
 use App\Http\Controllers\Pegawai\KursiController as PegawaiKursiController;
 use App\Http\Controllers\Pegawai\PasienController as PegawaiPasienController;
@@ -20,8 +21,13 @@ use Illuminate\Support\Facades\Route;
 // Halaman utama: TV Display / Monitor Antrean & Kursi Terapi
 Route::get('/', [GuestDashboardController::class, 'index'])->name('guest.dashboard');
 
-// Redirect praktis bila ada yang mengakses tanpa prefix althe
+// Pendaftaran pasien mandiri untuk tamu (guest)
+Route::get('/register', [GuestRegisterController::class, 'create'])->name('guest.register');
+Route::post('/register', [GuestRegisterController::class, 'store'])->name('guest.register.store');
+
+// Redirect praktis bila ada yang mengakses tanpa/dengan prefix althe
 Route::redirect('/login', '/althe/login');
+Route::redirect('/althe/register', '/register');
 Route::redirect('/admin', '/althe/admin/dashboard');
 Route::redirect('/pegawai', '/althe/pegawai/dashboard');
 
@@ -42,6 +48,8 @@ Route::prefix('althe')->group(function () {
         Route::post('/pasien', [PegawaiPasienController::class, 'store'])->name('pegawai.pasien.store');
         Route::put('/pasien/{pasien}', [PegawaiPasienController::class, 'update'])->name('pegawai.pasien.update');
         Route::delete('/pasien/{pasien}', [PegawaiPasienController::class, 'destroy'])->name('pegawai.pasien.destroy');
+        Route::post('/pasien/{pasien}/approve', [PegawaiPasienController::class, 'approve'])->name('pegawai.pasien.approve');
+        Route::post('/pasien/{pasien}/reject', [PegawaiPasienController::class, 'reject'])->name('pegawai.pasien.reject');
 
         // Kursi & Timer (khusus pegawai: hanya lihat / read-only)
         Route::get('/kursi', [PegawaiKursiController::class, 'index'])->name('pegawai.kursi.index');
@@ -71,6 +79,8 @@ Route::prefix('althe')->group(function () {
         Route::post('/pasien', [AdminPasienController::class, 'store'])->name('admin.pasien.store');
         Route::put('/pasien/{pasien}', [AdminPasienController::class, 'update'])->name('admin.pasien.update');
         Route::delete('/pasien/{pasien}', [AdminPasienController::class, 'destroy'])->name('admin.pasien.destroy');
+        Route::post('/pasien/{pasien}/approve', [AdminPasienController::class, 'approve'])->name('admin.pasien.approve');
+        Route::post('/pasien/{pasien}/reject', [AdminPasienController::class, 'reject'])->name('admin.pasien.reject');
 
         // CRUD kursi (khusus admin; tambah & edit lewat pop-up)
         Route::get('/kursi', [KursiController::class, 'index'])->name('admin.kursi.index');

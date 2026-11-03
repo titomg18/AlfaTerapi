@@ -88,6 +88,18 @@
                     <div id="live-date" class="text-xs font-medium text-muted">{{ $tanggal }}</div>
                 </div>
 
+                {{-- Tombol Daftar Pasien Baru (Guest) --}}
+                <a href="{{ route('guest.register') }}"
+                   class="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl bg-accent px-3.5 text-xs font-bold text-white shadow-sm transition hover:bg-accent-dark">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <line x1="19" y1="8" x2="19" y2="14"/>
+                        <line x1="22" y1="11" x2="16" y2="11"/>
+                    </svg>
+                    <span>Daftar Pasien</span>
+                </a>
+
                 {{-- Tombol Fullscreen --}}
                 <button type="button" id="btn-fullscreen" title="Layar Penuh / TV Mode"
                         class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface text-muted transition hover:bg-accent-soft hover:text-accent-dark">

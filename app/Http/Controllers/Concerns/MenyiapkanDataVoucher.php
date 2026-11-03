@@ -32,7 +32,7 @@ trait MenyiapkanDataVoucher
                 ->values(),
 
             'timers' => Timer::orderBy('durasi_menit')->get(),
-            'pasiens' => Pasien::orderBy('nama')->get(['id', 'nama', 'no_telepon']),
+            'pasiens' => Pasien::disetujui()->orderBy('nama')->get(['id', 'nama', 'no_telepon']),
 
             'q' => $q,
             'status' => $status,

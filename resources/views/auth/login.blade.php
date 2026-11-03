@@ -141,6 +141,13 @@
                            hover:bg-accent-dark disabled:opacity-70 disabled:cursor-not-allowed">
                 Masuk
             </button>
+
+            <div class="mt-4 pt-4 border-t border-line text-center text-xs text-muted">
+                Pasien baru?
+                <a href="{{ route('guest.register') }}" class="font-semibold text-accent hover:text-accent-dark transition">
+                    Daftar Mandiri di Sini &rarr;
+                </a>
+            </div>
         </form>
     </div>
 

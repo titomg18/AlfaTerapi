@@ -9,6 +9,8 @@
         ['Transaksi', route('admin.transaksi.index'), '*admin/transaksi*', '<path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h4"/>'],
         ['Pegawai',   route('admin.pegawai.index'),   '*admin/pegawai*',   '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-5 7-5s7 1.5 7 5M17 4.5a3.5 3.5 0 0 1 0 7M22 20c0-2.5-1.5-4-4-4.6"/>'],
     ];
+
+    $pendingPasienCount = \App\Models\Pasien::pending()->count();
 @endphp
 
 {{-- Notifikasi Pop-up (Toast) --}}
@@ -32,7 +34,10 @@
                         ? 'bg-accent-soft font-semibold text-accent-dark'
                         : 'text-[#334E68] hover:bg-surface' }}">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">{!! $icon !!}</svg>
-            {{ $label }}
+            <span class="flex-1">{{ $label }}</span>
+            @if ($label === 'Pasien' && $pendingPasienCount > 0)
+                <span class="inline-flex items-center justify-center rounded-full bg-amber-500 px-2 py-0.5 text-[11px] font-bold text-white shadow-sm" title="{{ $pendingPasienCount }} pasien menunggu persetujuan">{{ $pendingPasienCount }}</span>
+            @endif
         </a>
     @endforeach
 </nav>
